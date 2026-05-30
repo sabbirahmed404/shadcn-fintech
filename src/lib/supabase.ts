@@ -6,8 +6,11 @@ import {
   type BudgetCategorySettings,
 } from "@/lib/budget-category-config"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0.0.1:55421"
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  ""
 
 declare global {
   var __wealthOsSupabase: SupabaseClient | undefined
@@ -17,6 +20,9 @@ function createSupabaseClient() {
   return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       storageKey: "wealthos-demo-auth",
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
     },
   })
 }
@@ -31,12 +37,51 @@ export const DEMO_USER_EMAIL = "sabbir@wealthos.local"
 export const DEMO_USER_PASSWORD = "password123"
 
 /**
+ * Singleton guard — prevents concurrent ensureAuthenticated() calls from
+ * causing a thundering herd of signOut/signIn requests.
+ */
+let _authPromise: Promise<import("@supabase/supabase-js").Session | null> | null = null
+
+/**
  * Ensures the client is authenticated with the local seed user.
  * Silently signs in using auth.signInWithPassword to avoid blocking RLS policies.
+ * After migrating from local → cloud Supabase, stale browser sessions may use
+ * tokens signed with the old JWT secret. We detect that and force re-auth.
  */
 export async function ensureAuthenticated() {
+  // If an auth attempt is already in flight, piggyback on it
+  if (_authPromise) return _authPromise
+
+  _authPromise = _doAuthenticate()
+  try {
+    return await _authPromise
+  } finally {
+    _authPromise = null
+  }
+}
+
+async function _doAuthenticate() {
   const { data: { session } } = await supabase.auth.getSession()
-  if (session) return session
+
+  if (session) {
+    // Validate the access token belongs to the current Supabase instance.
+    // Stale sessions from a local Supabase will have a different issuer and
+    // cause "No suitable key or wrong key type" errors with cloud PostgREST.
+    try {
+      const payload = JSON.parse(atob(session.access_token.split(".")[1]))
+      const expectedIssuer = `${supabaseUrl}/auth/v1`
+      if (payload.iss === expectedIssuer) {
+        return session
+      }
+      // Issuer mismatch — stale session from a different Supabase instance
+      console.warn("Stale session detected (issuer mismatch), re-authenticating…")
+      await supabase.auth.signOut()
+    } catch {
+      // Malformed token — clear and re-auth
+      console.warn("Malformed session token, re-authenticating…")
+      await supabase.auth.signOut()
+    }
+  }
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: DEMO_USER_EMAIL,

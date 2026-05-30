@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { motion } from "motion/react"
 import {
@@ -123,47 +122,8 @@ export default function SignInPage() {
             </p>
           </motion.div>
 
-          {/* Social buttons */}
-          <motion.div
-            className="mt-8 grid grid-cols-2 gap-3"
-            variants={itemVariants}
-          >
-            <Button variant="outline" size="lg" className="gap-2">
-              <Image
-                src="/logos/google-com.png"
-                alt="Google"
-                width={16}
-                height={16}
-                className="size-4"
-              />
-              <span className="text-sm">Google</span>
-            </Button>
-            <Button variant="outline" size="lg" className="gap-2">
-              <Image
-                src="/logos/apple-com.png"
-                alt="Apple"
-                width={16}
-                height={16}
-                className="size-4"
-              />
-              <span className="text-sm">Apple</span>
-            </Button>
-          </motion.div>
-
-          {/* Divider */}
-          <motion.div
-            className="relative my-6 flex items-center"
-            variants={itemVariants}
-          >
-            <div className="flex-1 border-t border-border" />
-            <span className="mx-3 text-xs text-muted-foreground">
-              or continue with
-            </span>
-            <div className="flex-1 border-t border-border" />
-          </motion.div>
-
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             <motion.div variants={itemVariants}>
               <label
                 htmlFor="email"
@@ -246,20 +206,6 @@ export default function SignInPage() {
               </Button>
             </motion.div>
           </form>
-
-          {/* Footer */}
-          <motion.p
-            className="mt-6 text-center text-sm text-muted-foreground"
-            variants={itemVariants}
-          >
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/sign-up"
-              className="font-medium text-foreground underline-offset-4 transition-colors hover:underline"
-            >
-              Sign up
-            </Link>
-          </motion.p>
 
           {/* Secured badge */}
           <motion.div
