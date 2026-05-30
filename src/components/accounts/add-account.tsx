@@ -24,46 +24,60 @@ interface AddAccountProps {
 
 type Step = "idle" | "form" | "loading" | "success"
 
+import { addAccount } from "@/lib/supabase"
+import { getInstitutionLogo } from "@/lib/utils"
+
 const accountTypes = [
-  { value: "checking", label: "Checking" },
-  { value: "savings", label: "Savings" },
-  { value: "crypto", label: "Crypto" },
-  { value: "investment", label: "Investment" },
+  { value: "bank", label: "Bank Account" },
+  { value: "cash", label: "Cash Wallet" },
+  { value: "mfs", label: "Mobile Money" },
 ] as const
 
-const typeColors: Record<string, string> = {
-  checking: "bg-blue-500",
-  savings: "bg-emerald-500",
-  crypto: "bg-orange-500",
-  investment: "bg-violet-500",
+type AccountTypeValue = (typeof accountTypes)[number]["value"]
+
+function normalizeAccountNumberLast4(accountNumber: string) {
+  const normalized = accountNumber.replace(/\D/g, "")
+  return normalized ? normalized.slice(-4) : null
 }
 
 export function AddAccount({ onAdd }: AddAccountProps) {
   const [step, setStep] = useState<Step>("idle")
   const [institution, setInstitution] = useState("")
-  const [accountType, setAccountType] = useState("")
+  const [accountType, setAccountType] = useState<AccountTypeValue | "">("")
   const [accountNumber, setAccountNumber] = useState("")
 
-  function handleConnect() {
+  async function handleConnect() {
     if (!institution || !accountType || !accountNumber) return
 
     setStep("loading")
-    setTimeout(() => {
-      const newAccount: BankAccount = {
-        id: `ba-${Date.now()}`,
-        name: `${institution} ${accountType.charAt(0).toUpperCase() + accountType.slice(1)}`,
-        type: accountType as BankAccount["type"],
-        institution,
-        institutionLogo: `/logos/${institution.toLowerCase().replace(/\s+/g, "")}-com.png`,
-        accountNumber: `****${accountNumber.slice(-4)}`,
-        balance: 0,
-        currency: "$",
+    
+    const accName = `${institution} ${accountType.charAt(0).toUpperCase() + accountType.slice(1)}`
+    
+    // Create real account in Supabase
+    const saved = await addAccount(
+      accName,
+      accountType,
+      institution,
+      0,
+      normalizeAccountNumberLast4(accountNumber)
+    )
+
+    if (saved) {
+      const mappedAccount: BankAccount = {
+        id: saved.id,
+        name: saved.name,
+        type: saved.type as BankAccount["type"],
+        institution: saved.provider || "Self",
+        institutionLogo: getInstitutionLogo(saved.provider),
+        accountNumber: saved.account_number_last4 ? `****${saved.account_number_last4}` : `****${accountNumber.slice(-4)}`,
+        balance: saved.balance,
+        currency: "৳",
         change: 0,
         changePercent: 0,
-        lastActivity: "Just now",
-        color: typeColors[accountType] ?? "bg-gray-500",
+        lastActivity: "Live",
+        color: saved.type === "cash" ? "bg-emerald-500" : saved.type === "mfs" ? "bg-pink-500" : "bg-blue-500"
       }
-      onAdd(newAccount)
+      onAdd(mappedAccount)
       setStep("success")
 
       setTimeout(() => {
@@ -72,7 +86,10 @@ export function AddAccount({ onAdd }: AddAccountProps) {
         setAccountType("")
         setAccountNumber("")
       }, 1500)
-    }, 1500)
+    } else {
+      // If error, revert to idle (could show error step)
+      setStep("idle")
+    }
   }
 
   return (

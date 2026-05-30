@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { moneyMovementByPeriod } from "@/data/seed"
+import { getMoneyMovement, type MoneyMovementPoint, type MovementPeriod } from "@/lib/supabase"
 import { ArrowDownLeftIcon, ArrowUpRightIcon } from "lucide-react"
 
 const chartConfig = {
@@ -35,11 +35,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-type Period = keyof typeof moneyMovementByPeriod
-
 export function MoneyMovement() {
-  const [period, setPeriod] = useState<Period>("7d")
-  const data = moneyMovementByPeriod[period]
+  const [period, setPeriod] = useState<MovementPeriod>("7d")
+  const [data, setData] = useState<MoneyMovementPoint[]>([])
+
+  useEffect(() => {
+    getMoneyMovement(period).then(setData)
+  }, [period])
 
   const totals = useMemo(() => {
     const inTotal = data.reduce((s, d) => s + d.moneyIn, 0)
@@ -53,7 +55,7 @@ export function MoneyMovement() {
         <CardTitle className="text-base font-semibold">
           Money Movement
         </CardTitle>
-        <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
+        <Select value={period} onValueChange={(v) => setPeriod(v as MovementPeriod)}>
           <SelectTrigger className="h-8 w-[110px] text-xs">
             <SelectValue />
           </SelectTrigger>
@@ -74,7 +76,7 @@ export function MoneyMovement() {
             <div>
               <p className="text-[10px] font-medium text-emerald-600/70 dark:text-emerald-400/70">Money In</p>
               <p className="text-sm font-bold tabular-nums text-emerald-700 dark:text-emerald-300">
-                ${totals.in.toLocaleString()}
+                ৳{totals.in.toLocaleString()}
               </p>
             </div>
           </div>
@@ -85,7 +87,7 @@ export function MoneyMovement() {
             <div>
               <p className="text-[10px] font-medium text-rose-600/70 dark:text-rose-400/70">Money Out</p>
               <p className="text-sm font-bold tabular-nums text-rose-700 dark:text-rose-300">
-                ${totals.out.toLocaleString()}
+                ৳{totals.out.toLocaleString()}
               </p>
             </div>
           </div>
@@ -95,7 +97,7 @@ export function MoneyMovement() {
         <div className="flex items-center justify-between rounded-lg border px-3 py-2">
           <span className="text-xs text-muted-foreground">Net Flow</span>
           <span className="text-sm font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
-            +${totals.net.toLocaleString()}
+            {totals.net >= 0 ? "+" : "-"}৳{Math.abs(totals.net).toLocaleString()}
           </span>
         </div>
 
@@ -126,13 +128,13 @@ export function MoneyMovement() {
               fontSize={11}
               tickMargin={4}
               stroke="var(--color-muted-foreground)"
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v) => `৳${(v / 1000).toFixed(0)}k`}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   formatter={(value) =>
-                    `$${Number(value).toLocaleString()}`
+                    `৳${Number(value).toLocaleString()}`
                   }
                 />
               }

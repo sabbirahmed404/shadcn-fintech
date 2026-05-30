@@ -12,7 +12,7 @@ interface AccountSummaryProps {
   accounts: BankAccount[]
 }
 
-const fmt = (n: number, currency = "$") =>
+const fmt = (n: number, currency = "৳") =>
   `${currency}${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

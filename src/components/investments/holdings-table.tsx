@@ -179,7 +179,7 @@ export function HoldingsTable() {
                 className="hidden cursor-pointer select-none text-right md:table-cell"
                 onClick={() => cycleSortDir("plDollar")}
               >
-                P&L $ <SortIcon col="plDollar" sortKey={sortKey} sortDir={sortDir} />
+                P&L ৳ <SortIcon col="plDollar" sortKey={sortKey} sortDir={sortDir} />
               </TableHead>
               <TableHead className="hidden text-right pr-4 xl:table-cell">Trend</TableHead>
             </TableRow>
@@ -213,7 +213,7 @@ export function HoldingsTable() {
                     {h.quantity}
                   </TableCell>
                   <TableCell className="hidden text-right tabular-nums lg:table-cell">
-                    ${h.avgBuyPrice.toFixed(2)}
+                    ৳{h.avgBuyPrice.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
                     <motion.span
@@ -230,7 +230,7 @@ export function HoldingsTable() {
                       transition={{ duration: 0.6 }}
                       className="rounded px-1 py-0.5"
                     >
-                      ${h.currentPrice.toFixed(2)}
+                      ৳{h.currentPrice.toFixed(2)}
                     </motion.span>
                   </TableCell>
                   <TableCell
@@ -256,7 +256,7 @@ export function HoldingsTable() {
                     )}
                   >
                     {positive ? "+" : ""}
-                    ${pl.dollar.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ৳{pl.dollar.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell className="hidden pr-4 xl:table-cell">
                     <div className="ml-auto w-[80px] h-[30px]">

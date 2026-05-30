@@ -25,6 +25,7 @@ import {
   LifeBuoyIcon,
   LandmarkIcon,
   SendIcon,
+  UsersIcon,
   TrendingUpIcon,
   BitcoinIcon,
   BellIcon,
@@ -46,6 +47,7 @@ const data = {
   ],
   navMoney: [
     { title: "Transfers", url: "/transfers", icon: <SendIcon /> },
+    { title: "Contacts", url: "/contacts", icon: <UsersIcon /> },
     { title: "Investments", url: "/investments", icon: <TrendingUpIcon /> },
     { title: "Crypto", url: "/crypto", icon: <BitcoinIcon /> },
   ],

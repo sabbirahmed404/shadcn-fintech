@@ -11,6 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { PlusIcon } from "lucide-react"
+import { AddTransactionModal } from "@/components/transactions/add-transaction-modal"
+import { useState } from "react"
 
 interface TransactionFiltersProps {
   search: string
@@ -36,9 +40,25 @@ export function TransactionFilters({
   categories,
 }: TransactionFiltersProps) {
   const typeOptions = ["all", "income", "expense"] as const
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <AddTransactionModal 
+        open={modalOpen} 
+        onOpenChange={setModalOpen} 
+        onSuccess={() => {
+          // Trigger a refresh of the page or just a window location reload for simplicity right now
+          window.location.reload()
+        }}
+      />
+      
+      {/* Add Transaction Button */}
+      <Button size="sm" onClick={() => setModalOpen(true)} className="gap-2 shrink-0">
+        <PlusIcon className="size-4" />
+        <span className="hidden sm:inline">Add Transaction</span>
+      </Button>
+
       {/* Search */}
       <div className="relative w-full sm:min-w-[200px] sm:flex-1">
         <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

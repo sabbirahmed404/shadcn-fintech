@@ -118,7 +118,7 @@ export function CategoryDonut() {
                   content={
                     <ChartTooltipContent
                       formatter={(value) =>
-                        `$${Number(value).toLocaleString()}`
+                        `৳${Number(value).toLocaleString()}`
                       }
                     />
                   }
@@ -153,7 +153,7 @@ export function CategoryDonut() {
                   dominantBaseline="middle"
                   className="fill-foreground text-2xl font-bold tabular-nums"
                 >
-                  ${centerAmount.toLocaleString()}
+                  ৳{centerAmount.toLocaleString()}
                 </text>
                 <text
                   x="50%"
@@ -181,7 +181,7 @@ export function CategoryDonut() {
                 {entry.name}
               </span>
               <span className="ml-auto font-medium tabular-nums">
-                ${entry.value.toLocaleString()}
+                ৳{entry.value.toLocaleString()}
               </span>
             </div>
           ))}

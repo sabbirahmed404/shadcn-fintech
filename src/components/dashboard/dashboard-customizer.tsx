@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
+import { createPortal } from "react-dom"
 import {
   DndContext,
   pointerWithin,
@@ -17,7 +18,12 @@ import {
   useSortable,
 } from "@dnd-kit/sortable"
 import { Button } from "@/components/ui/button"
-import { GripVerticalIcon, LayoutGridIcon, LockIcon } from "lucide-react"
+import {
+  GripVerticalIcon,
+  LayoutGridIcon,
+  LockIcon,
+  RotateCcwIcon,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { FinancialOverview } from "@/components/dashboard/financial-overview"
 import { AccountCards } from "@/components/dashboard/account-cards"
@@ -26,6 +32,7 @@ import { SpendingLimit } from "@/components/dashboard/spending-limit"
 import { MoneyMovement } from "@/components/dashboard/money-movement"
 import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { HealthScore } from "@/components/dashboard/health-score"
+import { TotalBalance } from "@/components/dashboard/total-balance"
 
 type WidgetSize = "sm" | "lg" | "full"
 
@@ -52,9 +59,18 @@ const sizeClass: Record<WidgetSize, string> = {
 }
 
 const STORAGE_KEY = "vault-dashboard-order"
+const HEADER_ACTIONS_ID = "dashboard-header-actions"
+const emptySubscribe = () => () => {}
 
 // ── Null strategy: let CSS Grid handle layout, not dnd-kit transforms ──
 const nullStrategy = () => null
+
+const useHeaderActions = () =>
+  useSyncExternalStore(
+    emptySubscribe,
+    () => document.getElementById(HEADER_ACTIONS_ID),
+    () => null
+  )
 
 function SortableWidget({
   block,
@@ -96,6 +112,7 @@ function SortableWidget({
 }
 
 export function DashboardCustomizer() {
+  const headerActions = useHeaderActions()
   const [editing, setEditing] = useState(false)
   const [blocks, setBlocks] = useState(() => {
     if (typeof window === "undefined") return defaultBlocks
@@ -149,73 +166,84 @@ export function DashboardCustomizer() {
 
   const activeBlock = blocks.find((b) => b.id === activeId)
 
-  return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      {/* Edit toggle */}
-      <div className="flex items-center justify-end gap-2">
-        {editing && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs text-muted-foreground"
-            onClick={handleReset}
-          >
-            Reset layout
-          </Button>
-        )}
+  const customizeControls = (
+    <>
+      {editing && (
         <Button
-          variant={editing ? "default" : "outline"}
+          variant="ghost"
           size="sm"
-          className="h-7 gap-1.5 text-xs"
-          onClick={() => setEditing(!editing)}
+          className="h-8 text-xs text-muted-foreground"
+          onClick={handleReset}
         >
-          {editing ? (
-            <>
-              <LockIcon className="size-3" />
-              Lock
-            </>
-          ) : (
-            <>
-              <LayoutGridIcon className="size-3" />
-              Customize
-            </>
-          )}
+          <RotateCcwIcon data-icon="inline-start" />
+          <span className="hidden md:inline">Reset layout</span>
+          <span className="md:hidden">Reset</span>
         </Button>
-      </div>
-
-      <DndContext
-        sensors={sensors}
-        collisionDetection={pointerWithin}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
+      )}
+      <Button
+        variant={editing ? "default" : "outline"}
+        size="sm"
+        className="h-8 text-xs"
+        onClick={() => setEditing(!editing)}
       >
-        <SortableContext
-          items={blocks.map((b) => b.id)}
-          strategy={nullStrategy}
-        >
-          <div className="grid grid-cols-12 gap-4">
-            {blocks.map((block) => (
-              <SortableWidget
-                key={block.id}
-                block={block}
-                editing={editing}
-              />
-            ))}
-          </div>
-        </SortableContext>
+        {editing ? (
+          <>
+            <LockIcon data-icon="inline-start" />
+            <span className="hidden sm:inline">Lock</span>
+            <span className="sr-only sm:hidden">Lock dashboard layout</span>
+          </>
+        ) : (
+          <>
+            <LayoutGridIcon data-icon="inline-start" />
+            <span className="hidden sm:inline">Customize</span>
+            <span className="sr-only sm:hidden">Customize dashboard layout</span>
+          </>
+        )}
+      </Button>
+    </>
+  )
 
-        {/* Drag overlay — renders outside the grid, no distortion */}
-        <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
-          {activeBlock ? (
-            <div className="rounded-xl bg-card p-4 shadow-2xl ring-2 ring-primary/30 rotate-[1deg] scale-[1.02]">
-              <p className="text-sm font-medium text-muted-foreground">
-                {activeBlock.label}
-              </p>
+  return (
+    <>
+      {headerActions ? createPortal(customizeControls, headerActions) : null}
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        {/* Dedicated Total Available Balance banner */}
+        <TotalBalance />
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <SortableContext
+            items={blocks.map((b) => b.id)}
+            strategy={nullStrategy}
+          >
+            <div className="grid grid-cols-12 gap-4">
+              {blocks.map((block) => (
+                <SortableWidget
+                  key={block.id}
+                  block={block}
+                  editing={editing}
+                />
+              ))}
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-    </div>
+          </SortableContext>
+
+          {/* Drag overlay - renders outside the grid, no distortion */}
+          <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
+            {activeBlock ? (
+              <div className="rounded-xl bg-card p-4 shadow-2xl ring-2 ring-primary/30 rotate-[1deg] scale-[1.02]">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {activeBlock.label}
+                </p>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+    </>
   )
 }

@@ -1,0 +1,131 @@
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e975]:
+      - generic [ref=e976]:
+        - navigation [ref=e978]:
+          - button "previous" [disabled] [ref=e979]:
+            - img "previous" [ref=e980]
+          - generic [ref=e982]:
+            - generic [ref=e983]: 1/
+            - text: "2"
+          - button "next" [ref=e984] [cursor=pointer]:
+            - img "next" [ref=e985]
+        - link "Next.js 16.2.3 (stale) Turbopack" [ref=e988] [cursor=pointer]:
+          - /url: https://nextjs.org/docs/messages/version-staleness
+          - img [ref=e989]
+          - generic "There is a newer version (16.2.6) available, upgrade recommended!" [ref=e991]: Next.js 16.2.3 (stale)
+          - generic [ref=e992]: Turbopack
+      - generic [ref=e993]:
+        - dialog "Console Error" [ref=e994]:
+          - generic [ref=e997]:
+            - generic [ref=e998]:
+              - generic [ref=e999]:
+                - generic [ref=e1001]: Console Error
+                - generic [ref=e1002]:
+                  - button "Copy Error Info" [ref=e1003] [cursor=pointer]:
+                    - img [ref=e1004]
+                  - button "No related documentation found" [disabled] [ref=e1006]:
+                    - img [ref=e1007]
+                  - button "Attach Node.js inspector" [ref=e1009] [cursor=pointer]:
+                    - img [ref=e1010]
+              - generic [ref=e1018]:
+                - generic [ref=e1019]:
+                  - text: "Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`. at Button ("
+                  - link "http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409" [ref=e1020] [cursor=pointer]:
+                    - /url: http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409
+                  - text: ) at RecentTransactions (
+                  - link "http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418" [ref=e1021] [cursor=pointer]:
+                    - /url: http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418
+                  - text: ) at Page (about://React/Server/file:///Users/sabbirahmed/workspace/shadcn-fintech/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0i4moaz._.js?42:74:458)
+                - button "Show More" [ref=e1023] [cursor=pointer]
+            - generic [ref=e1024]:
+              - generic [ref=e1025]:
+                - paragraph [ref=e1027]:
+                  - img [ref=e1029]
+                  - generic [ref=e1032]: src/components/ui/button.tsx (50:5) @ Button
+                  - button "Open in editor" [ref=e1033] [cursor=pointer]:
+                    - img [ref=e1035]
+                - generic [ref=e1038]:
+                  - generic [ref=e1039]: "48 | }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {"
+                  - generic [ref=e1040]: 49 | return (
+                  - generic [ref=e1041]: "> 50 | <ButtonPrimitive"
+                  - generic [ref=e1042]: "| ^"
+                  - generic [ref=e1043]: 51 | data-slot="button"
+                  - generic [ref=e1044]: "52 | className={cn(buttonVariants({ variant, size, className }))}"
+                  - generic [ref=e1045]: "53 | {...props}"
+              - generic [ref=e1046]:
+                - generic [ref=e1047]:
+                  - paragraph [ref=e1048]:
+                    - text: Call Stack
+                    - generic [ref=e1049]: "56"
+                  - button "Show 50 ignore-listed frame(s)" [ref=e1050] [cursor=pointer]:
+                    - text: Show 50 ignore-listed frame(s)
+                    - img [ref=e1051]
+                - generic [ref=e1053]:
+                  - generic [ref=e1054]:
+                    - text: Button
+                    - button "Open Button in editor" [ref=e1055] [cursor=pointer]:
+                      - img [ref=e1056]
+                  - text: src/components/ui/button.tsx (50:5)
+                - generic [ref=e1058]:
+                  - generic [ref=e1059]:
+                    - text: RecentTransactions
+                    - button "Open RecentTransactions in editor" [ref=e1060] [cursor=pointer]:
+                      - img [ref=e1061]
+                  - text: src/components/dashboard/recent-transactions.tsx (72:9)
+                - generic [ref=e1063]:
+                  - generic [ref=e1064]:
+                    - text: Page
+                    - button "Open Page in editor" [ref=e1065] [cursor=pointer]:
+                      - img [ref=e1066]
+                  - text: src/app/(dashboard)/dashboard/page.tsx (4:10)
+                - generic [ref=e1068]:
+                  - generic [ref=e1069]:
+                    - text: Button
+                    - button "Open Button in editor" [ref=e1070] [cursor=pointer]:
+                      - img [ref=e1071]
+                  - text: src/components/ui/button.tsx (50:5)
+                - generic [ref=e1073]:
+                  - generic [ref=e1074]:
+                    - text: RecentTransactions
+                    - button "Open RecentTransactions in editor" [ref=e1075] [cursor=pointer]:
+                      - img [ref=e1076]
+                  - text: src/components/dashboard/recent-transactions.tsx (72:9)
+                - generic [ref=e1078]:
+                  - generic [ref=e1079]:
+                    - text: Page
+                    - button "Open Page in editor" [ref=e1080] [cursor=pointer]:
+                      - img [ref=e1081]
+                  - text: src/app/(dashboard)/dashboard/page.tsx (4:10)
+          - generic [ref=e1083]: "1"
+          - generic [ref=e1084]: "2"
+        - contentinfo [ref=e1085]:
+          - region "Error feedback" [ref=e1086]:
+            - paragraph [ref=e1087]:
+              - link "Was this helpful?" [ref=e1088] [cursor=pointer]:
+                - /url: https://nextjs.org/telemetry#error-feedback
+            - button "Mark as helpful" [ref=e1089] [cursor=pointer]:
+              - img [ref=e1090]
+            - button "Mark as not helpful" [ref=e1093] [cursor=pointer]:
+              - img [ref=e1094]
+    - generic [ref=e485] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e486]:
+        - img [ref=e487]
+      - generic [ref=e860]:
+        - button "Open issues overlay" [ref=e861]:
+          - generic [ref=e1096]:
+            - generic [ref=e1097]: "1"
+            - generic [ref=e1098]: "2"
+          - generic [ref=e865]:
+            - text: Issue
+            - generic [ref=e1099]: s
+        - button "Collapse issues badge" [ref=e866]:
+          - img [ref=e867]
+  - generic [ref=e870]: Nov
+  - generic [ref=e1101]:
+    - img [ref=e1102]
+    - heading "This page couldn’t load" [level=1] [ref=e1104]
+    - paragraph [ref=e1105]: Reload to try again, or go back.
+    - generic [ref=e1106]:
+      - button "Reload" [ref=e1108] [cursor=pointer]
+      - button "Back" [ref=e1109] [cursor=pointer]

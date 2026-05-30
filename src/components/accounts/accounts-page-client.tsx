@@ -1,27 +1,58 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 
-import { bankAccounts, type BankAccount } from "@/data/seed"
+import type { BankAccount } from "@/data/seed"
 import { cn } from "@/lib/utils"
 import { AccountSummary } from "@/components/accounts/account-summary"
 import { AccountCard } from "@/components/accounts/account-grid"
 import { AddAccount } from "@/components/accounts/add-account"
 import { EmptyState } from "@/components/empty-state"
+import { getAccounts } from "@/lib/supabase"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getInstitutionLogo } from "@/lib/utils"
 
 const filterTabs = [
   { value: "all", label: "All" },
-  { value: "checking", label: "Checking" },
-  { value: "savings", label: "Savings" },
-  { value: "crypto", label: "Crypto" },
-  { value: "investment", label: "Investment" },
+  { value: "bank", label: "Bank Accounts" },
+  { value: "cash", label: "Cash Wallet" },
+  { value: "mfs", label: "Mobile Money" },
 ] as const
 
 type AccountType = (typeof filterTabs)[number]["value"]
 
+function mapDbAccount(d: Awaited<ReturnType<typeof getAccounts>>[number]): BankAccount {
+  return {
+    id: d.id,
+    name: d.name,
+    type: d.type as BankAccount["type"],
+    institution: d.provider || "Self",
+    institutionLogo: getInstitutionLogo(d.provider),
+    accountNumber: d.account_number_last4 ? `****${d.account_number_last4}` : "****",
+    balance: d.balance,
+    currency: d.currency === "USD" ? "$" : d.currency === "EUR" ? "€" : "৳",
+    change: 0,
+    changePercent: 0,
+    lastActivity: "Live",
+    color: d.type === "cash" ? "bg-emerald-500" : d.type === "mfs" ? "bg-pink-500" : "bg-blue-500",
+  }
+}
+
 export function AccountsPageClient() {
   const [selectedType, setSelectedType] = useState<AccountType>("all")
-  const [accounts, setAccounts] = useState<BankAccount[]>(bankAccounts)
+  const [accounts, setAccounts] = useState<BankAccount[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true)
+      const data = await getAccounts()
+
+      setAccounts(data.map(mapDbAccount))
+      setIsLoading(false)
+    }
+    load()
+  }, [])
 
   const filtered = useMemo(
     () =>
@@ -35,10 +66,20 @@ export function AccountsPageClient() {
     setAccounts((prev) => [...prev, account])
   }
 
+  function handleUpdateAccount(updated: BankAccount) {
+    setAccounts((prev) =>
+      prev.map((account) => (account.id === updated.id ? updated : account))
+    )
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {/* Summary row */}
-      <AccountSummary accounts={accounts} />
+      {isLoading ? (
+        <Skeleton className="h-[120px] w-full rounded-xl bg-foreground/5" />
+      ) : (
+        <AccountSummary accounts={accounts} />
+      )}
 
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-1.5">
@@ -59,16 +100,32 @@ export function AccountsPageClient() {
       </div>
 
       {/* Account grid + add card */}
-      {filtered.length === 0 ? (
-        <EmptyState
-          variant="filter"
-          title="No accounts in this category"
-          description="You don't have any accounts of this type yet. Try a different filter or link a new account."
-        />
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="h-32 w-full rounded-xl bg-foreground/5" />
+          <Skeleton className="h-32 w-full rounded-xl bg-foreground/5" />
+          <Skeleton className="h-32 w-full rounded-xl bg-foreground/5" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <AddAccount onAdd={handleAddAccount} />
+          <div className="col-span-1 md:col-span-1 lg:col-span-2">
+            <EmptyState
+              variant="filter"
+              title="No accounts in this category"
+              description="You don't have any accounts of this type yet. Try a different filter or link a new account."
+            />
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((account, i) => (
-            <AccountCard key={account.id} account={account} index={i} />
+            <AccountCard
+              key={account.id}
+              account={account}
+              index={i}
+              onUpdate={handleUpdateAccount}
+            />
           ))}
           <AddAccount onAdd={handleAddAccount} />
         </div>

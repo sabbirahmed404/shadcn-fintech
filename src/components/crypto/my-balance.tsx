@@ -39,14 +39,14 @@ export function MyBalance({ prices }: { prices: CryptoPrices }) {
   const stats = [
     {
       label: "Total Profit",
-      value: `+$${(totalBalance * 0.033).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `+৳${(totalBalance * 0.033).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       positive: true,
     },
     { label: "Avg. Growing", value: "+14.63%", positive: true },
     {
       label: coin ? coin.symbol : "Best Token",
       value: coin
-        ? `$${coinValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        ? `৳${coinValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         : "Ethereum",
       positive: null,
     },
@@ -62,7 +62,7 @@ export function MyBalance({ prices }: { prices: CryptoPrices }) {
       if (!val || val <= 0) return
       setTopUpFlow("loading")
       setTimeout(() => {
-        setSuccessMsg(`Topped up $${val.toFixed(2)}`)
+        setSuccessMsg(`Topped up ৳${val.toFixed(2)}`)
         setTopUpFlow("success")
         setTimeout(() => {
           setTopUpFlow("idle")
@@ -83,7 +83,7 @@ export function MyBalance({ prices }: { prices: CryptoPrices }) {
       if (!val || val <= 0) return
       setWithdrawFlow("loading")
       setTimeout(() => {
-        setSuccessMsg(`Withdrew $${val.toFixed(2)}`)
+        setSuccessMsg(`Withdrew ৳${val.toFixed(2)}`)
         setWithdrawFlow("success")
         setTimeout(() => {
           setWithdrawFlow("idle")
@@ -121,7 +121,7 @@ export function MyBalance({ prices }: { prices: CryptoPrices }) {
           transition={{ duration: 0.3 }}
           className="text-3xl font-bold tabular-nums tracking-tight"
         >
-          ${totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ৳{totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </motion.p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -1,14 +1,18 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 
-import { fullTransactions, type FullTransaction } from "@/data/seed"
 import { TransactionSummary } from "@/components/transactions/transaction-summary"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { TransactionTable } from "@/components/transactions/transaction-table"
 import { TransactionActions } from "@/components/transactions/transaction-actions"
+import { getTransactions, deleteTransactions, type DbTransaction } from "@/lib/supabase"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function TransactionsPageClient() {
+  const [data, setData] = useState<DbTransaction[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -16,45 +20,48 @@ export function TransactionsPageClient() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const categories = useMemo(() => {
-    const cats = new Set(fullTransactions.map((t) => t.category))
-    return Array.from(cats).sort()
+  useEffect(() => {
+    getTransactions().then((txs) => {
+      setData(txs)
+      setIsLoading(false)
+    })
   }, [])
 
+  const categories = useMemo(() => {
+    const cats = new Set(data.map((t) => t.category))
+    return Array.from(cats).sort()
+  }, [data])
+
   const filteredData = useMemo(() => {
-    let data: FullTransaction[] = fullTransactions
+    let result = data
 
     if (search) {
       const q = search.toLowerCase()
-      data = data.filter(
+      result = result.filter(
         (t) =>
-          t.merchant.toLowerCase().includes(q) ||
-          t.transactionId.toLowerCase().includes(q) ||
+          (t.description?.toLowerCase() || "").includes(q) ||
+          t.account_name.toLowerCase().includes(q) ||
           t.category.toLowerCase().includes(q)
       )
     }
 
     if (categoryFilter !== "all") {
-      data = data.filter((t) => t.category === categoryFilter)
-    }
-
-    if (statusFilter !== "all") {
-      data = data.filter((t) => t.status === statusFilter)
+      result = result.filter((t) => t.category === categoryFilter)
     }
 
     if (typeFilter !== "all") {
-      data = data.filter((t) => t.type === typeFilter)
+      result = result.filter((t) => t.type === typeFilter)
     }
 
-    return data
-  }, [search, categoryFilter, statusFilter, typeFilter])
+    return result
+  }, [data, search, categoryFilter, typeFilter])
 
   function handleExport() {
-    const selected = fullTransactions.filter((t) => selectedIds.has(t.id))
-    const header = "Merchant,Transaction ID,Amount,Date,Status,Type"
+    const selected = data.filter((t) => selectedIds.has(t.id))
+    const header = "Description,Account,Amount,Date,Type"
     const rows = selected.map(
       (t) =>
-        `"${t.merchant}","${t.transactionId}",${t.amount},"${t.date}","${t.status}","${t.type}"`
+        `"${t.description || ""}","${t.account_name}",${t.amount},"${new Date(t.occurred_at).toLocaleDateString()}","${t.type}"`
     )
     const csv = [header, ...rows].join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
@@ -64,6 +71,27 @@ export function TransactionsPageClient() {
     a.download = "transactions.csv"
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  async function handleDelete() {
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+    if (!confirm(`Are you sure you want to delete ${ids.length} transactions?`)) return
+    
+    setIsLoading(true)
+    const success = await deleteTransactions(ids)
+    if (success) {
+      setSelectedIds(new Set())
+      const newTxs = await getTransactions()
+      setData(newTxs)
+    } else {
+      alert("Failed to delete transactions")
+    }
+    setIsLoading(false)
+  }
+
+  if (isLoading) {
+    return <TransactionsLoadingSkeleton />
   }
 
   return (
@@ -94,7 +122,50 @@ export function TransactionsPageClient() {
         selectedCount={selectedIds.size}
         onExport={handleExport}
         onClear={() => setSelectedIds(new Set())}
+        onDelete={handleDelete}
       />
+    </div>
+  )
+}
+
+function TransactionsLoadingSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-20 rounded-xl" />
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Skeleton className="h-9 w-full rounded-lg sm:w-64" />
+        <Skeleton className="h-9 w-full rounded-lg sm:w-32" />
+        <Skeleton className="h-9 w-full rounded-lg sm:w-32" />
+      </div>
+
+      <div className="flex flex-col gap-2 sm:hidden">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-xl border border-foreground/10 p-3"
+          >
+            <Skeleton className="size-9 rounded-lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+            <Skeleton className="h-4 w-16" />
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:block">
+        <div className="flex flex-col gap-2 p-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 rounded-lg" />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

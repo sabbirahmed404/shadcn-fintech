@@ -12,9 +12,9 @@ interface CardListProps {
 }
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value)

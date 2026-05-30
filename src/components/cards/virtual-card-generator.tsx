@@ -128,7 +128,7 @@ export function VirtualCardGenerator({
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  Monthly Limit ($)
+                  Monthly Limit (৳)
                 </label>
                 <Input
                   type="number"

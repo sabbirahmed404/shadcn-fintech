@@ -1,0 +1,166 @@
+[    1131ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[    1180ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[    1327ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[    1407ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409)
+    at RecentTransactions (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418)
+    at Page (about://React/Server/file:///Users/sabbirahmed/workspace/shadcn-fintech/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0i4moaz._.js?42:74:458) @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:3272
+[    1494ms] [LOG] [Fast Refresh] done in 277ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[    1652ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[    1673ms] [LOG] [Fast Refresh] done in 122ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   11142ms] Error: Base UI: MenuGroupRootContext is missing. Menu group parts must be used within <Menu.Group>.
+    at useMenuGroupRootContext (http://localhost:3100/_next/static/chunks/11-y_%40base-ui_react_esm_menu_0x3w~95._.js:607:15)
+    at MenuGroupLabelComponent (http://localhost:3100/_next/static/chunks/11-y_%40base-ui_react_esm_menu_0x3w~95._.js:681:517)
+    at Object.react_stack_bottom_frame (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:15037:24)
+    at renderWithHooks (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:4620:24)
+    at updateForwardRef (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:5908:21)
+    at beginWork (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:6766:24)
+    at runWithFiberInDEV (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:965:74)
+    at performUnitOfWork (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:9555:97)
+    at workLoopSync (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:9449:40)
+    at renderRootSync (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:9098:47)
+    at performSyncWorkOnRoot (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:10263:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:10179:316)
+    at processRootScheduleInMicrotask (http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:10200:106)
+    at http://localhost:3100/_next/static/chunks/0ko6_next_dist_compiled_react-dom_0s219lc._.js:10274:158
+[   29505ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   29698ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   29722ms] [LOG] [Fast Refresh] done in 295ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   30021ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   30068ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   30229ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409)
+    at RecentTransactions (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418)
+    at Page (about://React/Server/file:///Users/sabbirahmed/workspace/shadcn-fintech/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0i4moaz._.js?42:74:458) @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:3272
+[   44754ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   44798ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   44915ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409)
+    at RecentTransactions (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418)
+    at Page (about://React/Server/file:///Users/sabbirahmed/workspace/shadcn-fintech/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0i4moaz._.js?42:74:458) @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:3272
+[   56478ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   56644ms] [LOG] [Fast Refresh] done in 284ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   56774ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   57681ms] [LOG] [Fast Refresh] done in 1035ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   70288ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   70336ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   70493ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409)
+    at RecentTransactions (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418)
+    at Page (about://React/Server/file:///Users/sabbirahmed/workspace/shadcn-fintech/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__0i4moaz._.js?42:74:458) @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:3272
+[   83685ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[   83726ms] [LOG] [Fast Refresh] done in 141ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  905949ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  906981ms] [LOG] [Fast Refresh] done in 1134ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  907767ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  907845ms] [LOG] [Fast Refresh] done in 178ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  908172ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  908318ms] [LOG] [Fast Refresh] done in 247ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  917936ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  917957ms] [LOG] [Fast Refresh] done in 123ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  918478ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[  918661ms] [LOG] [Fast Refresh] done in 284ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 1986469ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 1987560ms] [LOG] [Fast Refresh] done in 1107ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 1987707ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 1988431ms] [LOG] [Fast Refresh] done in 825ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2004013ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2004029ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2099425ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2099435ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2163514ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2163637ms] [LOG] [Fast Refresh] done in 224ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2211476ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2211568ms] [LOG] [Fast Refresh] done in 194ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2224172ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2224199ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2252492ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2252512ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2261789ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2261819ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2268092ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2268117ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2286061ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2286852ms] [LOG] [Fast Refresh] done in 546ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2287164ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2287168ms] [LOG] [Fast Refresh] done in 104ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2420011ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2421604ms] [LOG] [Fast Refresh] done in 1388ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2421893ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2422017ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2439159ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2439291ms] [LOG] [Fast Refresh] done in 216ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2457860ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2457954ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2484235ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2484290ms] [LOG] [Fast Refresh] done in 149ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2520523ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2520591ms] [LOG] [Fast Refresh] done in 154ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2622270ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2622321ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2865203ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2865254ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2865468ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 2865596ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3002074ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3002268ms] [LOG] [Fast Refresh] done in 289ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3007277ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3007278ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3172660ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3172858ms] [LOG] [Fast Refresh] done in 300ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3228740ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3229000ms] [LOG] [Fast Refresh] done in 317ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3229115ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3229226ms] [LOG] [Fast Refresh] done in 212ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3253471ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3253529ms] [LOG] [Fast Refresh] done in 160ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3254228ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3254398ms] [LOG] [Fast Refresh] done in 270ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3254632ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3255653ms] [LOG] [Fast Refresh] done in 772ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3255977ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at Button (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0ul6vfe._.js:82:409)
+    at RecentTransactions (http://localhost:3100/_next/static/chunks/workspace_shadcn-fintech_src_0vm0e48._.js:4193:418) @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:3272
+[ 3281212ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3281425ms] [LOG] [Fast Refresh] done in 113ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3417022ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3421944ms] [LOG] [Fast Refresh] done in 5023ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3422047ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3422704ms] [LOG] [Fast Refresh] done in 757ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3428551ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3428607ms] [LOG] [Fast Refresh] done in 157ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3441575ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3441719ms] [LOG] [Fast Refresh] done in 225ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3444732ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3444813ms] [LOG] [Fast Refresh] done in 182ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3481429ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3481572ms] [LOG] [Fast Refresh] done in 189ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3499713ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3499818ms] [LOG] [Fast Refresh] done in 191ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3548684ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3548956ms] [LOG] [Fast Refresh] done in 356ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3569144ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3570575ms] [LOG] [Fast Refresh] done in 1529ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3570718ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3570962ms] [LOG] [Fast Refresh] done in 344ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3619771ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3619809ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3636703ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3636743ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3746525ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3746536ms] [LOG] [Fast Refresh] done in 114ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3755375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3755493ms] [LOG] [Fast Refresh] done in 172ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3762405ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3762442ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3842546ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3843221ms] [LOG] [Fast Refresh] done in 753ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3852505ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3852627ms] [LOG] [Fast Refresh] done in 223ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3915616ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 3915764ms] [LOG] [Fast Refresh] done in 188ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 4765882ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 4766085ms] [LOG] [Fast Refresh] done in 275ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 4775811ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431
+[ 4776085ms] [LOG] [Fast Refresh] done in 244ms @ http://localhost:3100/_next/static/chunks/0ko6_next_dist_01dsmks._.js:2431

@@ -284,9 +284,9 @@ function NotificationsTab() {
 // ── Billing Tab ──────────────────────────────────────────────────────────────
 
 const invoices = [
-  { date: "Mar 01, 2026", amount: "$0.00", status: "Free Plan", id: "INV-001" },
-  { date: "Feb 01, 2026", amount: "$0.00", status: "Free Plan", id: "INV-002" },
-  { date: "Jan 01, 2026", amount: "$0.00", status: "Free Plan", id: "INV-003" },
+  { date: "Mar 01, 2026", amount: "৳0.00", status: "Free Plan", id: "INV-001" },
+  { date: "Feb 01, 2026", amount: "৳0.00", status: "Free Plan", id: "INV-002" },
+  { date: "Jan 01, 2026", amount: "৳0.00", status: "Free Plan", id: "INV-003" },
 ]
 
 const freeFeatures = [
@@ -333,7 +333,7 @@ function BillingTab() {
               </ul>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold tabular-nums">$0</p>
+              <p className="text-2xl font-bold tabular-nums">৳0</p>
               <p className="text-sm text-muted-foreground">/month</p>
             </div>
           </div>
@@ -355,7 +355,7 @@ function BillingTab() {
                 </ul>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold tabular-nums">$12</p>
+                <p className="text-2xl font-bold tabular-nums">৳12</p>
                 <p className="text-sm text-muted-foreground">/month</p>
               </div>
             </div>

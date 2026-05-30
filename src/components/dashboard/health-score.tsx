@@ -11,7 +11,8 @@ import {
   CardAction,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { financialHealthScore, type HealthFactor } from "@/data/seed"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getFinancialHealth, type ComputedHealthFactor, type FinancialHealth } from "@/lib/supabase"
 import {
   HeartPulseIcon,
   TrendingUpIcon,
@@ -192,7 +193,7 @@ function ScoreGauge({ score }: { score: number }) {
 
 // ── Factor detail panel ──────────────────────────────────────────────────────
 
-function FactorDetail({ factor, onClose }: { factor: HealthFactor; onClose: () => void }) {
+function FactorDetail({ factor, onClose }: { factor: ComputedHealthFactor; onClose: () => void }) {
   const cfg = statusColor[factor.status]
   const RING_R = 22
   const RING_C = 2 * Math.PI * RING_R
@@ -255,8 +256,37 @@ function FactorDetail({ factor, onClose }: { factor: HealthFactor; onClose: () =
 // ── Main component ───────────────────────────────────────────────────────────
 
 export function HealthScore() {
-  const { overall, trend, trendDelta, factors } = financialHealthScore
-  const [selectedFactor, setSelectedFactor] = useState<HealthFactor | null>(null)
+  const [health, setHealth] = useState<FinancialHealth | null>(null)
+  const [selectedFactor, setSelectedFactor] = useState<ComputedHealthFactor | null>(null)
+
+  useEffect(() => {
+    getFinancialHealth().then(setHealth)
+  }, [])
+
+  if (!health) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <HeartPulseIcon className="size-4 text-primary" />
+            Financial Health
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center gap-4">
+            <Skeleton className="h-[110px] w-[180px] rounded-xl" />
+            <div className="w-full space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-7 w-full rounded-lg" />
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const { overall, trend, trendDelta, factors } = health
 
   return (
     <Card>

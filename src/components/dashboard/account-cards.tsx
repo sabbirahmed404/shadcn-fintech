@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { accountCards, walletBalance } from "@/data/seed"
 import {
   CreditCardIcon,
   PlusIcon,
@@ -13,6 +12,8 @@ import {
   XIcon,
   CheckCircle2Icon,
   LoaderCircleIcon,
+  BanknoteIcon,
+  CoinsIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,50 +25,112 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "motion/react"
-import { cn } from "@/lib/utils"
+import { getAccounts, addAccount, AccountWithBalance } from "@/lib/supabase"
+import { cn, getInstitutionLogo } from "@/lib/utils"
 
 type AddState = "idle" | "form" | "adding" | "success"
 
-const initialCards = [
-  {
-    ...accountCards[0],
-    style: "bg-muted text-foreground",
-    icon: <EuroIcon className="size-5 opacity-30" />,
-    chipColor: "bg-foreground/10",
-    last4: "4589",
-  },
-  {
-    ...accountCards[1],
-    style: "bg-primary text-primary-foreground",
-    icon: <BitcoinIcon className="size-5 opacity-30" />,
-    chipColor: "bg-primary-foreground/20",
-    last4: "7321",
-  },
-  {
-    ...accountCards[2],
-    style: "bg-card text-card-foreground ring-1 ring-border",
-    icon: <ChartLineIcon className="size-5 opacity-30" />,
-    chipColor: "bg-foreground/10",
-    last4: "9012",
-  },
-]
+// Card styling config based on provider / type
+const getCardStyle = (provider: string | null, type: string, index: number) => {
+  const normProvider = provider?.toLowerCase() || ""
+  if (normProvider.includes("bkash")) {
+    return {
+      style: "bg-gradient-to-br from-pink-500 via-rose-500 to-pink-600 text-white border-none",
+      icon: <CoinsIcon className="size-5 opacity-30 text-white" />,
+      chipColor: "bg-white/20",
+    }
+  }
+  if (normProvider.includes("nagad")) {
+    return {
+      style: "bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 text-white border-none",
+      icon: <CoinsIcon className="size-5 opacity-30 text-white" />,
+      chipColor: "bg-white/20",
+    }
+  }
+  if (normProvider.includes("rocket")) {
+    return {
+      style: "bg-gradient-to-br from-purple-500 via-indigo-500 to-purple-600 text-white border-none",
+      icon: <CoinsIcon className="size-5 opacity-30 text-white" />,
+      chipColor: "bg-white/20",
+    }
+  }
+  if (normProvider.includes("ucb")) {
+    return {
+      style: "bg-gradient-to-br from-blue-800 via-blue-900 to-slate-950 text-white border-none",
+      icon: <CreditCardIcon className="size-5 opacity-30 text-white" />,
+      chipColor: "bg-white/20",
+    }
+  }
+  if (normProvider.includes("redot") || normProvider.includes("redhot") || normProvider.includes("reddot")) {
+    return {
+      style: "bg-gradient-to-br from-red-500 via-rose-600 to-red-700 text-white border-none",
+      icon: <CreditCardIcon className="size-5 opacity-30 text-white" />,
+      chipColor: "bg-white/20",
+    }
+  }
+
+  // Fallbacks
+  const palettes = [
+    {
+      style: "bg-muted text-foreground border-white/5",
+      icon: <CreditCardIcon className="size-5 opacity-30" />,
+      chipColor: "bg-foreground/10",
+    },
+    {
+      style: "bg-primary text-primary-foreground border-none",
+      icon: <ChartLineIcon className="size-5 opacity-30" />,
+      chipColor: "bg-primary-foreground/20",
+    },
+    {
+      style: "bg-gradient-to-br from-violet-600 to-purple-800 text-white border-none",
+      icon: <CreditCardIcon className="size-5 opacity-30" />,
+      chipColor: "bg-white/20",
+    },
+  ]
+  return palettes[index % palettes.length]
+}
 
 const newCardOptions = [
-  { value: "savings", label: "Savings Account", currency: "$", style: "bg-emerald-600 text-white", icon: <TrendingUpIcon className="size-5 opacity-30" />, chipColor: "bg-white/20" },
-  { value: "business", label: "Business Account", currency: "$", style: "bg-violet-600 text-white", icon: <CreditCardIcon className="size-5 opacity-30" />, chipColor: "bg-white/20" },
-  { value: "travel", label: "Travel Card", currency: "€", style: "bg-amber-600 text-white", icon: <EuroIcon className="size-5 opacity-30" />, chipColor: "bg-white/20" },
+  { value: "ucb", label: "UCB Bank Mastercard", type: "bank" as const, provider: "UCB" },
+  { value: "redotpay", label: "Red Hot Pay", type: "bank" as const, provider: "ReddotPay" },
+  { value: "rocket", label: "DB bill rocket", type: "mfs" as const, provider: "Rocket" },
+  { value: "bkash", label: "bKash MFS", type: "mfs" as const, provider: "bKash" },
+  { value: "nagad", label: "Nagad MFS", type: "mfs" as const, provider: "Nagad" },
 ]
 
 export function AccountCards() {
-  const [cards, setCards] = useState(initialCards)
-  const [order, setOrder] = useState(() => initialCards.map((_, i) => i))
+  const [accounts, setAccounts] = useState<AccountWithBalance[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [order, setOrder] = useState<number[]>([])
+  
+  // Card adding form states
   const [addState, setAddState] = useState<AddState>("idle")
   const [newCardType, setNewCardType] = useState("savings")
   const [newCardName, setNewCardName] = useState("")
+  const [newCardInitialBalance, setNewCardInitialBalance] = useState("5000")
 
+  // Fetch accounts from Supabase
+  const loadAccounts = async () => {
+    setIsLoading(true)
+    const data = await getAccounts()
+    setAccounts(data)
+    
+    // Set order for stacking (only bank and mfs accounts in the stack)
+    const cardAccounts = data.filter(a => a.type === "bank" || a.type === "mfs")
+    setOrder(cardAccounts.map((_, i) => i))
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    loadAccounts()
+  }, [])
+
+  // Rotate stack of cards
   const cycle = useCallback(() => {
     setOrder((prev) => {
+      if (prev.length <= 1) return prev
       const next = [...prev]
       const front = next.pop()!
       next.unshift(front)
@@ -75,42 +138,57 @@ export function AccountCards() {
     })
   }, [])
 
+  // Automatic stack rotation
   useEffect(() => {
-    if (addState !== "idle") return
-    const id = setInterval(cycle, 2000)
+    if (addState !== "idle" || order.length <= 1) return
+    const id = setInterval(cycle, 3000)
     return () => clearInterval(id)
-  }, [cycle, addState])
+  }, [cycle, addState, order.length])
 
-  const handleAdd = () => {
+  // Handle adding card to database
+  const handleAdd = async () => {
+    const initialAmt = parseFloat(newCardInitialBalance) || 0
+    const option = newCardOptions.find((o) => o.value === newCardType) || newCardOptions[0]
+    
     setAddState("adding")
-    setTimeout(() => {
-      const option = newCardOptions.find((o) => o.value === newCardType)!
-      const newCard = {
-        id: String(cards.length + 1),
-        label: newCardName || option.label,
-        balance: "0",
-        currency: option.currency,
-        variant: "default" as const,
-        style: option.style,
-        icon: option.icon,
-        chipColor: option.chipColor,
-        last4: String(Math.floor(1000 + Math.random() * 9000)),
-      }
-      setCards((prev) => [...prev, newCard])
-      setOrder((prev) => [...prev, prev.length])
+    
+    const newAcc = await addAccount(
+      newCardName || option.label,
+      option.type,
+      option.provider,
+      initialAmt
+    )
+
+    if (newAcc) {
       setAddState("success")
-      setTimeout(() => {
+      setTimeout(async () => {
         setAddState("idle")
         setNewCardName("")
+        setNewCardInitialBalance("5000")
+        await loadAccounts()
       }, 1500)
-    }, 1200)
+    } else {
+      setAddState("form")
+    }
   }
 
+  // Filter accounts for card display
+  const cardAccounts = accounts.filter(a => a.type === "bank" || a.type === "mfs")
+
+  // Wallet balances
+  const cashAccounts = accounts.filter(a => a.type === "cash" || a.type === "mfs")
+  const walletBalanceAmount = cashAccounts.reduce((sum, a) => sum + a.balance, 0)
+
   return (
-    <Card>
+    <Card className="overflow-hidden border-border/40 backdrop-blur-md">
       <CardContent className="flex flex-col gap-5 pt-6">
         <AnimatePresence mode="wait">
-          {addState === "idle" ? (
+          {isLoading ? (
+            <div className="flex h-[200px] flex-col justify-center space-y-4">
+              <Skeleton className="h-[120px] w-full rounded-2xl bg-foreground/5" />
+              <Skeleton className="h-5 w-1/3 bg-foreground/5" />
+            </div>
+          ) : addState === "idle" ? (
             <motion.div
               key="cards"
               initial={{ opacity: 0 }}
@@ -118,51 +196,81 @@ export function AccountCards() {
               exit={{ opacity: 0 }}
             >
               {/* Stacked cards */}
-              <div className="relative h-[200px]">
-                {order.map((cardIndex, stackPos) => {
-                  const c = cards[cardIndex]
-                  if (!c) return null
-                  const isFront = stackPos === order.length - 1
-                  const maxOffset = 48 / Math.max(order.length - 1, 1)
-                  return (
-                    <motion.button
-                      key={c.id}
-                      onClick={cycle}
-                      layout
-                      animate={{
-                        y: stackPos * Math.min(maxOffset, 16),
-                        scale: 1 - (order.length - 1 - stackPos) * (0.12 / Math.max(order.length - 1, 1)),
-                        zIndex: stackPos,
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 28 }}
-                      className={cn(
-                        "absolute inset-x-0 flex h-[152px] cursor-pointer flex-col justify-between rounded-2xl px-5 py-4",
-                        c.style,
-                        isFront ? "shadow-xl" : "shadow-md"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold tracking-wide">{c.label}</span>
-                        {c.icon}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className={cn("h-7 w-10 rounded-md", c.chipColor)} />
-                        <NfcIcon className="size-4 opacity-20" />
-                      </div>
-                      <div className="flex items-end justify-between">
-                        <span className="font-mono text-[10px] tracking-widest opacity-40">
-                          **** {c.last4}
-                        </span>
-                        <p className="text-xl font-bold tabular-nums tracking-tight">
-                          {c.currency === "BTC"
-                            ? `${c.balance} ${c.currency}`
-                            : `${c.currency}${c.balance}`}
-                        </p>
-                      </div>
-                    </motion.button>
-                  )
-                })}
-              </div>
+              {cardAccounts.length === 0 ? (
+                <div className="flex h-[152px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-muted-foreground/20 text-center p-4">
+                  <CreditCardIcon className="size-8 text-muted-foreground/40 mb-2" />
+                  <p className="text-xs font-medium text-muted-foreground">No accounts linked</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 mt-1 text-[10px]"
+                    onClick={() => setAddState("form")}
+                  >
+                    Link account
+                  </Button>
+                </div>
+              ) : (
+                <div className="relative h-[180px]">
+                  {order.map((cardIndex, stackPos) => {
+                    const c = cardAccounts[cardIndex]
+                    if (!c) return null
+                    
+                    const isFront = stackPos === order.length - 1
+                    const maxOffset = 36 / Math.max(order.length - 1, 1)
+                    
+                    // Style config
+                    const { style, icon, chipColor } = getCardStyle(c.provider, c.type, cardIndex)
+
+                    return (
+                      <motion.button
+                        key={c.id}
+                        onClick={cycle}
+                        layout
+                        animate={{
+                          y: stackPos * Math.min(maxOffset, 12),
+                          scale: 1 - (order.length - 1 - stackPos) * (0.08 / Math.max(order.length - 1, 1)),
+                          zIndex: stackPos,
+                        }}
+                        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                        className={cn(
+                          "absolute inset-x-0 flex h-[140px] cursor-pointer flex-col justify-between rounded-2xl px-5 py-4 border text-left",
+                          style,
+                          isFront ? "shadow-lg shadow-black/10" : "shadow-sm"
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold tracking-wide uppercase">
+                            {c.name}
+                          </span>
+                          {c.provider ? (
+                            <div className="flex h-6 w-12 items-center justify-center overflow-hidden">
+                              <img
+                                src={getInstitutionLogo(c.provider)}
+                                alt={c.provider}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                          ) : (
+                            icon
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={cn("h-6 w-9 rounded-md shadow-inner", chipColor)} />
+                          <NfcIcon className="size-3.5 opacity-20" />
+                        </div>
+                        <div className="flex items-end justify-between">
+                          <span className="font-mono text-[9px] tracking-widest opacity-50">
+                            **** {c.account_number_last4 || "0000"}
+                          </span>
+                          <p className="text-lg font-black tabular-nums tracking-tight">
+                            {c.currency === "USD" ? "$" : c.currency === "EUR" ? "€" : "৳"}{c.balance.toLocaleString()}
+                          </p>
+                        </div>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -170,7 +278,7 @@ export function AccountCards() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex h-[200px] flex-col"
+              className="flex h-[210px] flex-col"
             >
               {addState === "success" ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-2">
@@ -181,50 +289,64 @@ export function AccountCards() {
                   >
                     <CheckCircle2Icon className="size-10 text-emerald-500" />
                   </motion.div>
-                  <p className="text-sm font-semibold">Card added!</p>
-                  <p className="text-xs text-muted-foreground">
-                    {newCardName || newCardOptions.find((o) => o.value === newCardType)?.label}
+                  <p className="text-sm font-semibold">Account added!</p>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {newCardName || newCardOptions.find((o) => o.value === newCardType)?.label} has been integrated.
                   </p>
                 </div>
               ) : addState === "adding" ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3">
                   <LoaderCircleIcon className="size-8 animate-spin text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Creating card...</p>
+                  <p className="text-sm text-muted-foreground">Linking account with Supabase...</p>
                 </div>
               ) : (
                 <div className="flex flex-1 flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold">Add New Card</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Add New Account</p>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-7"
+                      className="size-7 rounded-full hover:bg-foreground/5"
                       onClick={() => setAddState("idle")}
                     >
                       <XIcon className="size-4" />
                     </Button>
                   </div>
+                  
                   <Select value={newCardType} onValueChange={(v) => v && setNewCardType(v)}>
-                    <SelectTrigger className="h-9 text-xs">
+                    <SelectTrigger className="h-8 text-xs bg-background/50 border-white/5">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
                       {newCardOptions.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
+                        <SelectItem key={o.value} value={o.value} className="text-xs">
+                          {o.label} ({o.provider})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+
                   <Input
-                    placeholder="Card name (optional)"
+                    placeholder="Account name (e.g. Savings Card)"
                     value={newCardName}
                     onChange={(e) => setNewCardName(e.target.value)}
-                    className="h-9 text-xs"
+                    className="h-8 text-xs bg-background/50 border-white/5"
                   />
-                  <Button className="h-9 gap-2 text-xs" onClick={handleAdd}>
+
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">৳</span>
+                    <Input
+                      type="number"
+                      placeholder="Initial balance"
+                      value={newCardInitialBalance}
+                      onChange={(e) => setNewCardInitialBalance(e.target.value)}
+                      className="h-8 pl-6 text-xs bg-background/50 border-white/5 font-mono"
+                    />
+                  </div>
+
+                  <Button className="h-8 gap-2 text-xs font-semibold" onClick={handleAdd}>
                     <PlusIcon className="size-3.5" />
-                    Create Card
+                    Link & Sync Account
                   </Button>
                 </div>
               )}
@@ -233,15 +355,15 @@ export function AccountCards() {
         </AnimatePresence>
 
         {/* Card count + add */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-dashed border-border/60 pt-4">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <CreditCardIcon className="size-3.5" />
-            <span>{cards.length} cards</span>
+            <span>{isLoading ? "..." : cardAccounts.length} active accounts</span>
           </div>
           <Button
             variant="outline"
             size="icon"
-            className="size-7 rounded-full"
+            className="size-7 rounded-full border-border/80 bg-background/50 hover:bg-foreground/5 hover:scale-105 active:scale-95 transition-all"
             onClick={() => addState === "idle" && setAddState("form")}
           >
             <PlusIcon className="size-3.5" />
@@ -249,14 +371,20 @@ export function AccountCards() {
         </div>
 
         {/* Wallet balance */}
-        <div className="space-y-1.5 border-t pt-5">
-          <p className="text-xs font-medium text-muted-foreground">Wallet Balance</p>
-          <p className="text-3xl font-bold tabular-nums tracking-tight">
-            ${walletBalance.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
-          <div className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-            <TrendingUpIcon className="size-4" />
-            <span>+{walletBalance.changePercent}% this month</span>
+        <div className="space-y-1.5 border-t border-border/40 pt-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">Wallet Balance</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-3xl font-black tabular-nums tracking-tight select-all">
+              {isLoading ? (
+                <Skeleton className="h-9 w-36 bg-foreground/10 rounded" />
+              ) : (
+                `৳${walletBalanceAmount.toLocaleString("en-BD", { minimumFractionDigits: 2 })}`
+              )}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            <TrendingUpIcon className="size-3.5" />
+            <span>Fully synced with transaction ledger</span>
           </div>
         </div>
       </CardContent>

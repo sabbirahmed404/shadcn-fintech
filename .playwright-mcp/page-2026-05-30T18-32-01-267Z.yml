@@ -1,0 +1,282 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link [ref=e208] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e11]
+            - generic [ref=e13]:
+              - generic [ref=e14]: Shadcn Fintech
+              - generic [ref=e15]: Finance Dashboard
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Daily
+          - list [ref=e19]:
+            - listitem [ref=e20]:
+              - link [ref=e209] [cursor=pointer]:
+                - /url: /dashboard
+                - img [ref=e22]
+                - generic [ref=e27]: Overview
+            - listitem [ref=e28]:
+              - link [ref=e210] [cursor=pointer]:
+                - /url: /accounts
+                - img [ref=e30]
+                - generic [ref=e33]: Accounts
+            - listitem [ref=e34]:
+              - link [ref=e211] [cursor=pointer]:
+                - /url: /transactions
+                - img [ref=e36]
+                - generic [ref=e39]: Transactions
+            - listitem [ref=e40]:
+              - link [ref=e212] [cursor=pointer]:
+                - /url: /cards
+                - img [ref=e42]
+                - generic [ref=e44]: Cards
+        - generic [ref=e45]:
+          - generic [ref=e46]: Money
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - link [ref=e213] [cursor=pointer]:
+                - /url: /transfers
+                - img [ref=e50]
+                - generic [ref=e53]: Transfers
+            - listitem [ref=e54]:
+              - link [ref=e214] [cursor=pointer]:
+                - /url: /contacts
+                - img [ref=e56]
+                - generic [ref=e61]: Contacts
+            - listitem [ref=e62]:
+              - link [ref=e215] [cursor=pointer]:
+                - /url: /investments
+                - img [ref=e64]
+                - generic [ref=e67]: Investments
+            - listitem [ref=e68]:
+              - link [ref=e216] [cursor=pointer]:
+                - /url: /crypto
+                - img [ref=e70]
+                - generic [ref=e72]: Crypto
+        - generic [ref=e73]:
+          - generic [ref=e74]: Insights
+          - list [ref=e75]:
+            - listitem [ref=e76]:
+              - link [ref=e217] [cursor=pointer]:
+                - /url: /analytics
+                - img [ref=e78]
+                - generic [ref=e81]: Analytics
+            - listitem [ref=e82]:
+              - link [ref=e218] [cursor=pointer]:
+                - /url: /budgets
+                - img [ref=e84]
+                - generic [ref=e88]: Budgets
+        - generic [ref=e89]:
+          - generic [ref=e90]: Auth
+          - list [ref=e91]:
+            - listitem [ref=e92]:
+              - link [ref=e219] [cursor=pointer]:
+                - /url: /sign-in
+                - img [ref=e94]
+                - generic [ref=e97]: Sign In
+            - listitem [ref=e98]:
+              - link [ref=e220] [cursor=pointer]:
+                - /url: /sign-up
+                - img [ref=e100]
+                - generic [ref=e103]: Sign Up
+        - list [ref=e106]:
+          - listitem [ref=e107]:
+            - button [ref=e221]:
+              - img [ref=e109]
+              - generic [ref=e112]: Notifications
+              - generic [ref=e113]: "6"
+          - listitem [ref=e114]:
+            - link [ref=e222] [cursor=pointer]:
+              - /url: /settings
+              - img [ref=e116]
+              - generic [ref=e119]: Settings
+          - listitem [ref=e120]:
+            - link [ref=e223] [cursor=pointer]:
+              - /url: /support
+              - img [ref=e122]
+              - generic [ref=e129]: Help & Support
+      - list [ref=e131]:
+        - listitem [ref=e132]:
+          - button [ref=e224]:
+            - img [ref=e225]
+            - generic [ref=e136]:
+              - generic [ref=e137]: Abderrahim G.
+              - generic [ref=e138]: abderrahim@fintech.com
+            - img [ref=e139]
+    - main [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - button [ref=e226]:
+            - img
+            - generic [ref=e146]: Toggle Sidebar
+          - separator [ref=e147]
+          - navigation [ref=e227]:
+            - list [ref=e149]:
+              - listitem [ref=e150]:
+                - link [disabled] [ref=e228]: Contacts
+        - generic [ref=e152]:
+          - generic:
+            - generic: ⌘
+            - text: K
+          - button [ref=e229]:
+            - img
+            - generic [ref=e230]: Toggle theme
+      - generic [ref=e155]:
+        - heading [level=2] [ref=e231]: Command Palette
+        - paragraph [ref=e157]: Search pages, transactions, contacts, and more
+      - main [ref=e158]:
+        - generic [ref=e160]:
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - heading [level=1] [ref=e232]: Contacts
+              - paragraph [ref=e164]: People you send, lend, borrow, and settle money with.
+            - button [ref=e233]:
+              - img
+              - text: Add Contact
+          - generic [ref=e166]:
+            - generic [ref=e168]:
+              - img [ref=e170]
+              - generic [ref=e175]:
+                - paragraph [ref=e176]: Contacts
+                - paragraph [ref=e177]: "5"
+            - generic [ref=e179]:
+              - generic [ref=e181]: ↘
+              - generic [ref=e182]:
+                - paragraph [ref=e183]: Owed to you
+                - paragraph [ref=e184]: ৳6,000.00
+            - generic [ref=e186]:
+              - generic [ref=e188]: ↗
+              - generic [ref=e189]:
+                - paragraph [ref=e190]: You owe
+                - paragraph [ref=e191]: ৳15,000.00
+          - generic [ref=e192]:
+            - generic [ref=e236]:
+              - img [ref=e238]
+              - generic [ref=e239]:
+                - paragraph [ref=e240]: Fatima Begum
+                - paragraph [ref=e241]: “Fatima”
+                - paragraph [ref=e242]:
+                  - img [ref=e243]
+                  - text: "+8801812345679"
+              - generic [ref=e245]:
+                - button [ref=e246]:
+                  - img
+                - button [ref=e247]:
+                  - img
+            - generic [ref=e250]:
+              - img [ref=e252]
+              - generic [ref=e253]:
+                - paragraph [ref=e254]: Kamal Hossain
+                - paragraph [ref=e255]: “Kamal”
+                - paragraph [ref=e256]:
+                  - img [ref=e257]
+                  - text: "+8801912345680"
+                - generic [ref=e259]: You owe ৳5,000.00
+              - generic [ref=e260]:
+                - button [ref=e261]:
+                  - img
+                - button [ref=e262]:
+                  - img
+            - generic [ref=e265]:
+              - img [ref=e267]
+              - generic [ref=e268]:
+                - paragraph [ref=e269]: Nusrat Jahan
+                - paragraph [ref=e270]: “Nusrat”
+                - paragraph [ref=e271]:
+                  - img [ref=e272]
+                  - text: "+8801612345681"
+                - generic [ref=e274]: Owes you ৳3,000.00
+              - generic [ref=e275]:
+                - button [ref=e276]:
+                  - img
+                - button [ref=e277]:
+                  - img
+            - generic [ref=e280]:
+              - img [ref=e282]
+              - generic [ref=e283]:
+                - paragraph [ref=e284]: Rahim Uddin
+                - paragraph [ref=e285]: “Rahim”
+                - paragraph [ref=e286]:
+                  - img [ref=e287]
+                  - text: "+8801712345678"
+                - generic [ref=e289]: You owe ৳10,000.00
+              - generic [ref=e290]:
+                - button [ref=e291]:
+                  - img
+                - button [ref=e292]:
+                  - img
+            - generic [ref=e295]:
+              - img [ref=e297]
+              - generic [ref=e298]:
+                - paragraph [ref=e299]: Tanvir Islam
+                - paragraph [ref=e300]: “Tanvir”
+                - paragraph [ref=e301]:
+                  - img [ref=e302]
+                  - text: "+8801512345682"
+                - generic [ref=e304]: Owes you ৳3,000.00
+              - generic [ref=e305]:
+                - button [ref=e306]:
+                  - img
+                - button [ref=e307]:
+                  - img
+  - button "Open Next.js Dev Tools" [ref=e204] [cursor=pointer]:
+    - img [ref=e205]
+  - alert [ref=e308]
+  - dialog "Add contact" [ref=e312]:
+    - generic [ref=e313]:
+      - heading "Add contact" [level=2] [ref=e314]
+      - paragraph [ref=e315]: Add someone to your money ledger.
+    - generic [ref=e316]:
+      - generic [ref=e317]:
+        - generic [ref=e318]: Name
+        - textbox "Name" [active] [ref=e319]:
+          - /placeholder: e.g. Rahim Uddin
+      - generic [ref=e320]:
+        - generic [ref=e321]:
+          - generic [ref=e322]: Nickname
+          - textbox "Nickname" [ref=e323]:
+            - /placeholder: Optional
+        - generic [ref=e324]:
+          - generic [ref=e325]: Phone
+          - textbox "Phone" [ref=e326]:
+            - /placeholder: Optional
+      - generic [ref=e327]:
+        - generic [ref=e328]: Avatar
+        - generic [ref=e329]:
+          - img "Selected avatar" [ref=e331]
+          - generic [ref=e332]:
+            - button "Upload image" [ref=e333]:
+              - img
+              - text: Upload image
+            - paragraph [ref=e334]: PNG or JPG, up to 1.5 MB.
+        - paragraph [ref=e335]: Or pick a cartoon avatar
+        - generic [ref=e336]:
+          - button "Cartoon avatar 1" [ref=e337]:
+            - img "Cartoon avatar 1" [ref=e339]
+          - button "Cartoon avatar 2" [ref=e340]:
+            - img "Cartoon avatar 2" [ref=e342]
+          - button "Cartoon avatar 3" [ref=e343]:
+            - img "Cartoon avatar 3" [ref=e345]
+          - button "Cartoon avatar 4" [ref=e346]:
+            - img "Cartoon avatar 4" [ref=e348]
+          - button "Cartoon avatar 5" [ref=e349]:
+            - img "Cartoon avatar 5" [ref=e351]
+          - button "Cartoon avatar 6" [ref=e352]:
+            - img "Cartoon avatar 6" [ref=e354]
+          - button "Cartoon avatar 7" [ref=e355]:
+            - img "Cartoon avatar 7" [ref=e357]
+          - button "Cartoon avatar 8" [ref=e358]:
+            - img "Cartoon avatar 8" [ref=e360]
+      - generic [ref=e361]:
+        - generic [ref=e362]: Notes
+        - textbox "Notes" [ref=e363]:
+          - /placeholder: Optional
+    - generic [ref=e364]:
+      - button "Cancel" [ref=e365]
+      - button "Add contact" [disabled]
+    - button "Close" [ref=e366]:
+      - img
+      - generic [ref=e367]: Close

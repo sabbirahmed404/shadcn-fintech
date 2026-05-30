@@ -72,7 +72,7 @@ export function Watchlist() {
 
                 {/* Price */}
                 <span className="w-20 text-right text-sm font-medium tabular-nums">
-                  ${w.currentPrice.toFixed(2)}
+                  ৳{w.currentPrice.toFixed(2)}
                 </span>
 
                 {/* Day change badge */}

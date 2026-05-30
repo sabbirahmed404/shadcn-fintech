@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import type { FullTransaction } from "@/data/seed"
+import type { DbTransaction } from "@/lib/supabase"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table"
 
 interface TransactionTableProps {
-  transactions: FullTransaction[]
+  transactions: DbTransaction[]
   selectedIds: Set<string>
   setSelectedIds: (ids: Set<string>) => void
   expandedId: string | null
@@ -33,26 +33,11 @@ interface TransactionTableProps {
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 2,
   }).format(Math.abs(n))
-
-function statusBadge(status: FullTransaction["status"]) {
-  switch (status) {
-    case "completed":
-      return <Badge variant="default">Completed</Badge>
-    case "pending":
-      return (
-        <Badge variant="outline" className="text-amber-500 dark:text-amber-400">
-          Pending
-        </Badge>
-      )
-    case "failed":
-      return <Badge variant="destructive">Failed</Badge>
-  }
-}
 
 export function TransactionTable({
   transactions,
@@ -102,11 +87,10 @@ export function TransactionTable({
                 className="size-4 cursor-pointer rounded accent-primary"
               />
             </TableHead>
-            <TableHead>Merchant</TableHead>
-            <TableHead className="hidden sm:table-cell">Transaction ID</TableHead>
+            <TableHead>Description / Merchant</TableHead>
+            <TableHead className="hidden sm:table-cell">Account</TableHead>
             <TableHead className="text-right">Amount</TableHead>
             <TableHead className="hidden md:table-cell">Date</TableHead>
-            <TableHead className="hidden lg:table-cell">Status</TableHead>
             <TableHead className="w-10" />
           </TableRow>
         </TableHeader>
@@ -149,12 +133,13 @@ function TransactionRow({
   onToggleSelect,
   onToggleExpand,
 }: {
-  tx: FullTransaction
+  tx: DbTransaction
   isSelected: boolean
   isExpanded: boolean
   onToggleSelect: () => void
   onToggleExpand: () => void
 }) {
+  const metadata = tx.metadata as Record<string, any> | null
   return (
     <>
       <TableRow
@@ -177,16 +162,15 @@ function TransactionRow({
 
         <TableCell>
           <div className="flex items-center gap-2.5">
-            <Image
-              src={tx.logo}
-              alt={tx.merchant}
-              width={32}
-              height={32}
-              className="size-8 rounded-lg object-cover"
-              unoptimized
-            />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              {metadata?.icon ? (
+                <span className="text-sm font-semibold">{String(metadata.icon)[0].toUpperCase()}</span>
+              ) : (
+                <FileTextIcon className="size-4" />
+              )}
+            </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{tx.merchant}</p>
+              <p className="truncate text-sm font-medium">{tx.description || "Manual Transaction"}</p>
               <Badge variant="secondary" className="mt-0.5 text-[10px]">
                 {tx.category}
               </Badge>
@@ -195,29 +179,25 @@ function TransactionRow({
         </TableCell>
 
         <TableCell className="hidden sm:table-cell">
-          <span className="font-mono text-xs text-muted-foreground">
-            {tx.transactionId}
-          </span>
+          <Badge variant="outline" className="text-xs">
+            {tx.account_name}
+          </Badge>
         </TableCell>
 
         <TableCell className="text-right">
           <span
             className={cn(
               "tabular-nums text-sm font-semibold",
-              tx.type === "income" ? "text-emerald-500" : "text-foreground"
+              tx.direction === "in" ? "text-emerald-500" : "text-foreground"
             )}
           >
-            {tx.type === "income" ? "+" : "-"}
+            {tx.direction === "in" ? "+" : "-"}
             {fmt(tx.amount)}
           </span>
         </TableCell>
 
         <TableCell className="hidden md:table-cell">
-          <span className="text-sm text-muted-foreground">{tx.date}</span>
-        </TableCell>
-
-        <TableCell className="hidden lg:table-cell">
-          {statusBadge(tx.status)}
+          <span className="text-sm text-muted-foreground">{new Date(tx.occurred_at).toLocaleDateString()}</span>
         </TableCell>
 
         <TableCell>
@@ -247,32 +227,21 @@ function TransactionRow({
                 className="overflow-hidden"
               >
                 <div className="flex flex-wrap gap-4 border-b bg-muted/30 px-4 py-3 pl-12 text-sm">
-                  {tx.merchantInfo && (
-                    <div className="flex items-start gap-2 text-muted-foreground">
-                      <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
-                      <span>{tx.merchantInfo}</span>
-                    </div>
-                  )}
+                  <div className="flex items-start gap-2 text-muted-foreground">
+                    <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
+                    <span>Type: {tx.type}</span>
+                  </div>
 
-                  {tx.cardLast4 && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <CreditCardIcon className="size-3.5 shrink-0" />
-                      <span className="tabular-nums">
-                        Paid with card ending ****{tx.cardLast4}
-                      </span>
-                    </div>
-                  )}
-
-                  {tx.notes && (
+                  {metadata?.contact && (
                     <div className="flex items-start gap-2 text-muted-foreground">
                       <StickyNoteIcon className="mt-0.5 size-3.5 shrink-0" />
-                      <span>{tx.notes}</span>
+                      <span>Contact: {String(metadata.contact)}</span>
                     </div>
                   )}
 
                   <Button variant="ghost" size="xs" className="ml-auto">
                     <FileTextIcon className="size-3.5" />
-                    View Receipt
+                    View Details
                   </Button>
                 </div>
               </motion.div>

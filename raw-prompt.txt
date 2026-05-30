@@ -1,0 +1,128 @@
+Okay so right now what I want you to do is to reorganize my prompt and the thing I want to do, application for my health and finance. What I want you to do is structure it as well as give me some consideration, suggestion, or question for making a unified but distinctly capable app. I will provide a theme of the app, the typography, the layout, the color theme later. Overall I want the structure to be modern. 
+
+
+So we want to build a Next.js app and on a supabase database and storage. the app will have two distinct feature one for finance and another for health, We want to use ShadCN UI components. For dashboard and also for agents' chat UI.
+
+ Build first the Finance dashboard:
+- wallets
+- incomes
+- bills
+- tips
+- landing
+- expenses
+- free money things
+
+And after that we will build an agent in a separate page. 
+
+Great choices. Here's the full picture before we build — let me map out the complete feature set and app structure based on everything you described.Here's the full feature map for your app — click any module to dive deeper into that area.Here's the full breakdown of what each module covers, tailored to your situation:
+
+Dashboard — the first screen you see. Shows your total liquid across all 4 wallets in BDT (৳), net monthly income vs. expenses, a bills-due-this-month checklist, and your free money figure front and center. Clean numbers, no clutter.
+
+Wallets — separate balances for Cash, Bank, bKash, and Nagad. You can transfer between them (e.g. cash → bKash) and see the combined total at a glance. Each wallet has its own ledger of deposits and withdrawals.
+
+Income — built specifically for your project-based model. You log income entries tied to a project name, phase, and the company (Codemypixel). Since income isn't monthly-fixed, it tracks what came in this month vs. a rolling average, so you can see good months vs. lean ones.
+
+Bills — a list of recurring obligations with a monthly toggle. Internet is fixed. GYM can be toggled on/off per month. Real estate installment tracks how many months remain out of the total commitment. Family support and subscriptions (Google, Cursor, Copilot, etc.) are each their own line item. Each bill shows paid/unpaid status for the current month.
+
+Debts & lending — two-sided tracker. "They owe me" and "I owe them" — each entry has a person name, amount in ৳, date, optional note, and a settle button. Running totals for both sides.
+
+Expenses — one-off purchases logged with a category (food, transport, hardware, etc.) and wallet it came from. Automatically flows into the monthly breakdown.
+
+Free money — calculated as: income this month − total bills due − any manual provisions. This is the number you actually want to know before buying something or committing to a new expense.
+
+AI agent for assistance, a chat section to assist to get assistance, and the agent's knowledge is the database, and it can access and has a tool calling capability. We will use Gemini API. 
+
+The agent will also have the right option and it can directly insert a new cost budget and change the amount of something appropriately. After I talk with the agent and it wants to write it, it can write but it will take permission from me. So we can do it manually with the dashboard or also with the agent doing the automation for me. The agent will have the read rate option because we are going to implement it in a messaging app or chat app later. 
+
+
+On cloud sync: local super base instance on Docker. Currently, we are going to use and then shifting it to Cloud one. 
+
+Design direction: mobile-first card layout, clean typography, BDT (৳) as currency throughout, a bottom navigation bar on mobile
+------------
+for health dashboard:
+
+
+Ok, personal health application for me, which I will use to control my calories, my foods, my gym hour, and how much fat loss I want to do. It will have:a calorie calculator for my body fat and my calories for a day
+
+a graph dashboard of my body based on my weight, size, and things that are needed so that it will be my personal trainer as well and a tracking app
+
+it will suggest foods for breakfast, lunch, dinner, and snacks
+
+it will use AI to generate these suggestions based on my body fat or calories and my day-to-day activities
+
+Build the app as if you are a designer of an application, an engineer, and an architect. 
+
+First, before building the app, generate some questions, a consideration that I need to do, or some things that you need to know from me. with recommendations and options
+
+
+
+Do you want the AI to operate strictly within the web app, or would you like it integrated into a messaging platform (like a Telegram bot) so you can interact with it on the go?
+
+For now, we will use the Gemini API for AI, and in the web-based, we will go Telegram bot or other messaging later with API or things. 
+
+
+
+both this option
+
+"Option B: Natural language processing (e.g., you type "I ate a plate of rice, dal, and a piece of chicken" and the AI parses the macros).
+
+Option C: Vision-Language Model integration (you snap a photo on your phone, and the AI estimates the portion and calories)."
+
+
+
+right now " just track the duration and intensity of your 3-4 weekly sessions"
+
+right now "Should we stick to just weight and estimated body fat percentage,"
+
+chat-based interface where you "talk" to your app and agentic ai that knows me. and what I want to be. We will integrate RAG later. 
+
+
+Also there could be a different page where we can see the wealth target, where I can see:
+the Emergency Fund
+Savings
+Dream
+Vacation to Summer Return
+These are some targets that we can create and we can manage. We can delete them. We can see:
+
+Total Capital
+Total Percentage
+Suggestion
+Target Time
+Contribute to add them or not in the target
+There should be an Audit Ledger place where I can see the capital flow, like incoming or outgoing, the amount of money that is needed to be allocated to some bills. I also want to add manually. In the portfolio I want to see it as:
+
+my bank accounts, which are the Mastercard and Bcash, nagad, MFS, all separated
+my account balance in each of them on the Portfolio page tab
+
+All of this can be a tab within the financial part of the app. 
+
+
+these suggestions are good:
+
+Cross-Domain Insights: Because the AI has access to both databases, prompt it to find correlations. For example, the agent could playfully notice, "You spent ৳3,000 on dining out this week, which aligns with your calorie surplus. Let's tighten the budget and the diet next week." This makes the app truly feel like a unified life OS rather than two separate apps duct-taped together.
+
+
+
+Free Money to Wealth Target Pipeline: Since you have a "Free Money" calculation and "Wealth Targets," suggest adding an automation where the AI reviews your surplus at the end of the month and proposes an optimal split to fund your Emergency Fund or Summer Vacation goals.
+
+
+
+Bottom Navigation Layout: For the mobile-first design, a clean 4-tab bottom navigation bar works best: Dashboard (Finance) | Health | Agent (Center FAB) | Portfolio/Settings.
+
+
+
+yes to "Should we build a cron job or a summary tool that generates a "Weekly State" text file, so the agent only queries the deep database when explicitly asked":
+
+
+
+
+
+and want the app to statically calculate your TDEE (Total Daily Energy Expenditure) based on standard formulas
+
+
+
+want standard email/password Auth using supabase auth.
+
+
+
+Okay, this is my update. Now what I want you to do is to give me the prompt again, but in a structured and more detailed way. This should be like a message, not so technical, just a message about the services, features, and the structural way we want for the app right now. 

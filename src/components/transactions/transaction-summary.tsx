@@ -1,26 +1,26 @@
 import { ArrowDownLeftIcon, ArrowUpRightIcon, HashIcon, TrendingUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import type { FullTransaction } from "@/data/seed"
+import type { DbTransaction } from "@/lib/supabase"
 
 interface TransactionSummaryProps {
-  transactions: FullTransaction[]
+  transactions: DbTransaction[]
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 2,
   }).format(n)
 
 export function TransactionSummary({ transactions }: TransactionSummaryProps) {
   const totalIn = transactions
-    .filter((t) => t.type === "income")
+    .filter((t) => t.direction === "in")
     .reduce((s, t) => s + t.amount, 0)
 
   const totalOut = transactions
-    .filter((t) => t.type === "expense")
+    .filter((t) => t.direction === "out")
     .reduce((s, t) => s + Math.abs(t.amount), 0)
 
   const largest = transactions.length
@@ -46,7 +46,7 @@ export function TransactionSummary({ transactions }: TransactionSummaryProps) {
     },
     {
       label: "Largest",
-      value: largest ? fmt(Math.abs(largest.amount)) : "$0.00",
+      value: largest ? fmt(Math.abs(largest.amount)) : "৳0.00",
       icon: TrendingUpIcon,
       color: "text-primary",
       bg: "bg-primary/10",

@@ -16,9 +16,9 @@ interface CardControlsProps {
 }
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value)
@@ -30,7 +30,7 @@ export function CardControls({
   onToggleFreeze,
   dailyLimit,
   onDailyLimitChange,
-}: CardControlsProps) {
+ }: CardControlsProps) {
   const spendPercent =
     card.monthlyLimit > 0
       ? Math.round((card.monthlySpend / card.monthlyLimit) * 100)
@@ -82,8 +82,8 @@ export function CardControls({
             }}
           />
           <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
-            <span>$0</span>
-            <span>$10,000</span>
+            <span>৳0</span>
+            <span>৳10,000</span>
           </div>
         </div>
 

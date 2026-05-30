@@ -76,7 +76,7 @@ export function RecurringDetector() {
             <CardTitle>Recurring Charges</CardTitle>
             <CardDescription>
               <span className="tabular-nums font-medium text-foreground">
-                ${monthlyTotal.toFixed(2)}
+                ৳{monthlyTotal.toFixed(2)}
               </span>
               /month total
             </CardDescription>
@@ -111,7 +111,7 @@ export function RecurringDetector() {
               </div>
               <div className="text-right mr-2">
                 <p className="text-sm font-medium tabular-nums">
-                  ${charge.amount.toFixed(2)}
+                  ৳{charge.amount.toFixed(2)}
                 </p>
                 <p className="text-[10px] text-muted-foreground capitalize">
                   {charge.frequency}

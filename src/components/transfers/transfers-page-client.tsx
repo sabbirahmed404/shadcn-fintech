@@ -1,34 +1,51 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
-import { transferRecords, type TransferRecord } from "@/data/seed"
+import { getTransfers, type DbTransfer } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { TransferStats } from "@/components/transfers/transfer-stats"
 import { TransferList } from "@/components/transfers/transfer-list"
 import { QuickSend } from "@/components/transfers/quick-send"
 
-type TabKey = "all" | "sent" | "received" | "scheduled"
+type TabKey = "all" | "sent" | "received" | "debts"
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: "all", label: "All" },
   { key: "sent", label: "Sent" },
   { key: "received", label: "Received" },
-  { key: "scheduled", label: "Scheduled" },
+  { key: "debts", label: "Debts" },
 ]
 
 export function TransfersPageClient() {
   const [activeTab, setActiveTab] = useState<TabKey>("all")
-  const [transfers, setTransfers] = useState<TransferRecord[]>(transferRecords)
+  const [transfers, setTransfers] = useState<DbTransfer[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const load = async () => {
+    const data = await getTransfers()
+    setTransfers(data)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    // load() sets state only after awaiting the fetch (not synchronous)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load()
+  }, [])
 
   const filtered = useMemo(() => {
-    if (activeTab === "all") return transfers
-    return transfers.filter((t) => t.type === activeTab)
+    switch (activeTab) {
+      case "sent":
+        return transfers.filter((t) => t.direction === "out")
+      case "received":
+        return transfers.filter((t) => t.direction === "in")
+      case "debts":
+        return transfers.filter((t) => ["lend", "borrow", "repay"].includes(t.intent))
+      default:
+        return transfers
+    }
   }, [activeTab, transfers])
-
-  function handleCancel(id: string) {
-    setTransfers((prev) => prev.filter((t) => t.id !== id))
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,14 +71,10 @@ export function TransfersPageClient() {
       </div>
 
       {/* Transfer list */}
-      <TransferList transfers={filtered} onCancel={handleCancel} />
+      <TransferList transfers={filtered} loading={loading} />
 
       {/* Quick send */}
-      <QuickSend
-        onSend={(record) =>
-          setTransfers((prev) => [record, ...prev])
-        }
-      />
+      <QuickSend onSent={load} />
     </div>
   )
 }

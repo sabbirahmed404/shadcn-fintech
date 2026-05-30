@@ -45,7 +45,7 @@ export const accountCards: AccountCard[] = [
     id: "3",
     label: "Investment Portfolio",
     balance: "28,300",
-    currency: "$",
+    currency: "৳",
     variant: "primary",
   },
 ]
@@ -62,7 +62,7 @@ export const spendingLimit = {
   budget: 3000,
   spent: 2180,
   remaining: 920,
-  currency: "USD",
+  currency: "BDT",
   periodStart: "Apr 01",
   periodEnd: "Apr 30",
 }
@@ -434,9 +434,9 @@ export type AiInsight = {
 export const aiInsights: AiInsight[] = [
   { id: "ai1", text: "Your dining spending is up 19% this month — mostly DoorDash orders on weeknights.", trend: "up", percentChange: 19, category: "Food & Dining" },
   { id: "ai2", text: "Transport costs dropped 13% — great job using public transit more.", trend: "down", percentChange: 13, category: "Transport" },
-  { id: "ai3", text: "You have 3 subscriptions flagged for review totaling $93.74/month.", trend: "neutral", percentChange: 0, category: "Subscriptions" },
-  { id: "ai4", text: "Shopping jumped 37% — a $245 Airbnb booking and $90 Amazon order drove most of it.", trend: "up", percentChange: 37, category: "Shopping" },
-  { id: "ai5", text: "You're on track to save $1,200 this month if spending stays consistent.", trend: "down", percentChange: 8, category: "Savings" },
+  { id: "ai3", text: "You have 3 subscriptions flagged for review totaling ৳93.74/month.", trend: "neutral", percentChange: 0, category: "Subscriptions" },
+  { id: "ai4", text: "Shopping jumped 37% — a ৳245 Airbnb booking and ৳90 Amazon order drove most of it.", trend: "up", percentChange: 37, category: "Shopping" },
+  { id: "ai5", text: "You're on track to save ৳1,200 this month if spending stays consistent.", trend: "down", percentChange: 8, category: "Savings" },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -569,7 +569,7 @@ export const dailySpending: DailySpending[] = Array.from({ length: 30 }, (_, i) 
 export type BankAccount = {
   id: string
   name: string
-  type: "checking" | "savings" | "crypto" | "investment"
+  type: "checking" | "savings" | "crypto" | "investment" | "bank" | "cash" | "mfs"
   institution: string
   institutionLogo: string
   accountNumber: string
@@ -590,7 +590,7 @@ export const bankAccounts: BankAccount[] = [
     institutionLogo: logo("chase.com"),
     accountNumber: "****4589",
     balance: 24850.42,
-    currency: "$",
+    currency: "৳",
     change: 1240.00,
     changePercent: 5.2,
     lastActivity: "Today",
@@ -604,7 +604,7 @@ export const bankAccounts: BankAccount[] = [
     institutionLogo: logo("marcus.com"),
     accountNumber: "****7821",
     balance: 35200.00,
-    currency: "$",
+    currency: "৳",
     change: 880.50,
     changePercent: 2.6,
     lastActivity: "Yesterday",
@@ -618,7 +618,7 @@ export const bankAccounts: BankAccount[] = [
     institutionLogo: logo("coinbase.com"),
     accountNumber: "****3bc9",
     balance: 18450.80,
-    currency: "$",
+    currency: "৳",
     change: -620.30,
     changePercent: -3.2,
     lastActivity: "2 hours ago",
@@ -632,7 +632,7 @@ export const bankAccounts: BankAccount[] = [
     institutionLogo: logo("fidelity.com"),
     accountNumber: "****9012",
     balance: 61450.00,
-    currency: "$",
+    currency: "৳",
     change: 2840.00,
     changePercent: 4.8,
     lastActivity: "Today",
@@ -646,7 +646,7 @@ export const bankAccounts: BankAccount[] = [
     institutionLogo: logo("ally.com"),
     accountNumber: "****5567",
     balance: 4200.00,
-    currency: "$",
+    currency: "৳",
     change: 400.00,
     changePercent: 10.5,
     lastActivity: "3 days ago",
@@ -718,19 +718,19 @@ export type Notification = {
 }
 
 export const notifications: Notification[] = [
-  { id: "n0a", type: "request", title: "Money Request", description: "Elena Rodriguez is requesting $85.00 for concert tickets", time: "Just now", read: false, icon: "hand-coins", actionable: { accept: "Pay $85.00", decline: "Decline", amount: "$85.00", from: "Elena Rodriguez", fromAvatar: "/avatars/5.jpg" } },
+  { id: "n0a", type: "request", title: "Money Request", description: "Elena Rodriguez is requesting ৳85.00 for concert tickets", time: "Just now", read: false, icon: "hand-coins", actionable: { accept: "Pay ৳85.00", decline: "Decline", amount: "৳85.00", from: "Elena Rodriguez", fromAvatar: "/avatars/5.jpg" } },
   { id: "n0b", type: "security", title: "Authorize New Device", description: "Someone is trying to log in from a Windows PC in Berlin, Germany", time: "5 min ago", read: false, icon: "shield-alert", actionable: { accept: "Approve", decline: "Block" } },
-  { id: "n0c", type: "request", title: "Split Bill Request", description: "Marcus Johnson wants to split a $240.00 dinner bill (your share: $80.00)", time: "30 min ago", read: false, icon: "split", actionable: { accept: "Pay $80.00", decline: "Decline", amount: "$80.00", from: "Marcus Johnson", fromAvatar: "/avatars/3.jpg" } },
-  { id: "n1", type: "transaction", title: "Payment Received", description: "You received $4,250.00 from Stripe Payout", time: "2 min ago", read: false, icon: "arrow-down-left" },
+  { id: "n0c", type: "request", title: "Split Bill Request", description: "Marcus Johnson wants to split a ৳240.00 dinner bill (your share: ৳80.00)", time: "30 min ago", read: false, icon: "split", actionable: { accept: "Pay ৳80.00", decline: "Decline", amount: "৳80.00", from: "Marcus Johnson", fromAvatar: "/avatars/3.jpg" } },
+  { id: "n1", type: "transaction", title: "Payment Received", description: "You received ৳4,250.00 from Stripe Payout", time: "2 min ago", read: false, icon: "arrow-down-left" },
   { id: "n2", type: "security", title: "New Login Detected", description: "Your account was accessed from a new device in San Francisco, CA", time: "1 hour ago", read: false, icon: "shield-alert" },
-  { id: "n3", type: "transaction", title: "Card Payment", description: "You paid $120.00 to AWS Cloud Services", time: "3 hours ago", read: false, icon: "credit-card" },
+  { id: "n3", type: "transaction", title: "Card Payment", description: "You paid ৳120.00 to AWS Cloud Services", time: "3 hours ago", read: false, icon: "credit-card" },
   { id: "n4", type: "system", title: "Budget Alert", description: "You've reached 90% of your Food & Dining budget", time: "5 hours ago", read: true, icon: "alert-triangle" },
   { id: "n5", type: "promotion", title: "Upgrade to Vault Pro", description: "Get advanced analytics, unlimited virtual cards, and priority support", time: "1 day ago", read: true, icon: "sparkles" },
-  { id: "n6", type: "transaction", title: "Transfer Completed", description: "Your transfer of $250.00 to Sarah Chen was successful", time: "1 day ago", read: true, icon: "check-circle" },
+  { id: "n6", type: "transaction", title: "Transfer Completed", description: "Your transfer of ৳250.00 to Sarah Chen was successful", time: "1 day ago", read: true, icon: "check-circle" },
   { id: "n7", type: "security", title: "Password Changed", description: "Your account password was successfully updated", time: "2 days ago", read: true, icon: "lock" },
-  { id: "n8", type: "transaction", title: "Subscription Renewed", description: "Spotify Premium was renewed for $9.99", time: "2 days ago", read: true, icon: "repeat" },
+  { id: "n8", type: "transaction", title: "Subscription Renewed", description: "Spotify Premium was renewed for ৳9.99", time: "2 days ago", read: true, icon: "repeat" },
   { id: "n9", type: "system", title: "Card Expiring Soon", description: "Your Travel Credit card ending in 7321 expires next month", time: "3 days ago", read: true, icon: "clock" },
-  { id: "n10", type: "transaction", title: "Dividend Received", description: "AAPL Q1 2026 dividend payment of $142.50", time: "5 days ago", read: true, icon: "trending-up" },
+  { id: "n10", type: "transaction", title: "Dividend Received", description: "AAPL Q1 2026 dividend payment of ৳142.50", time: "5 days ago", read: true, icon: "trending-up" },
   { id: "n11", type: "system", title: "Monthly Statement Ready", description: "Your March 2026 account statement is available for download", time: "1 week ago", read: true, icon: "file-text" },
   { id: "n12", type: "security", title: "Two-Factor Enabled", description: "Two-factor authentication has been enabled on your account", time: "2 weeks ago", read: true, icon: "shield-check" },
 ]
@@ -925,10 +925,10 @@ export const faqItems: FaqItem[] = [
   { id: "faq1", category: "account", question: "How do I link a new bank account?", answer: "Go to the Accounts page, click \"Link New Account\", and follow the secure verification steps. We use 256-bit encryption and never store your bank credentials directly." },
   { id: "faq2", category: "payments", question: "How long do transfers take to process?", answer: "Domestic transfers typically complete within 1-2 business days. International transfers take 3-5 business days depending on the destination country and currency." },
   { id: "faq3", category: "security", question: "How do I enable two-factor authentication?", answer: "Navigate to Settings > Security, and toggle the Two-Factor Authentication switch. You can use an authenticator app or SMS verification. We recommend using an authenticator app for better security." },
-  { id: "faq4", category: "billing", question: "What's included in Vault Pro?", answer: "Vault Pro includes unlimited bank connections, advanced analytics & AI insights, unlimited virtual cards, priority support, custom budget categories, and export to CSV & PDF. It's $12/month." },
-  { id: "faq5", category: "account", question: "Can I have multiple currency accounts?", answer: "Yes! You can hold accounts in multiple currencies including USD, EUR, GBP, and more. Currency conversion happens at mid-market rates with a small transparent fee." },
+  { id: "faq4", category: "billing", question: "What's included in Vault Pro?", answer: "Vault Pro includes unlimited bank connections, advanced analytics & AI insights, unlimited virtual cards, priority support, custom budget categories, and export to CSV & PDF. It's ৳12/month." },
+  { id: "faq5", category: "account", question: "Can I have multiple currency accounts?", answer: "Yes! You can hold accounts in multiple currencies including BDT, USD, EUR, and more. Currency conversion happens at mid-market rates with a small transparent fee." },
   { id: "faq6", category: "security", question: "What happens if I notice suspicious activity?", answer: "Immediately freeze your cards from the Cards page, change your password in Settings > Security, and contact our support team. We have a dedicated fraud team that operates 24/7." },
-  { id: "faq7", category: "payments", question: "Is there a limit on transfers?", answer: "Free accounts can transfer up to $5,000/day and $25,000/month. Pro accounts have limits of $25,000/day and $100,000/month. Contact support for higher limits." },
+  { id: "faq7", category: "payments", question: "Is there a limit on transfers?", answer: "Free accounts can transfer up to ৳5,000/day and ৳25,000/month. Pro accounts have limits of ৳25,000/day and ৳100,000/month. Contact support for higher limits." },
   { id: "faq8", category: "general", question: "How do I export my transaction history?", answer: "Go to the Transactions page, select the transactions you want to export using the checkboxes, then click the \"Export CSV\" button in the floating action bar." },
   { id: "faq9", category: "billing", question: "Can I cancel my Pro subscription anytime?", answer: "Yes, you can cancel at any time from Settings > Billing. Your Pro features will remain active until the end of your current billing period." },
   { id: "faq10", category: "general", question: "Does Vault support cryptocurrency trading?", answer: "Yes! The Crypto section supports buying, selling, swapping, and tracking major cryptocurrencies including BTC, ETH, SOL, and more. Real-time price tracking updates every 3 seconds." },

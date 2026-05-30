@@ -1,30 +1,29 @@
-import { ArrowUpRightIcon, ArrowDownLeftIcon, ClockIcon } from "lucide-react"
+import { ArrowUpRightIcon, ArrowDownLeftIcon, ScaleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import type { TransferRecord } from "@/data/seed"
+import type { DbTransfer } from "@/lib/supabase"
 
 interface TransferStatsProps {
-  transfers: TransferRecord[]
+  transfers: DbTransfer[]
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 2,
   }).format(n)
 
 export function TransferStats({ transfers }: TransferStatsProps) {
   const totalSent = transfers
-    .filter((t) => t.type === "sent" && t.status === "completed")
+    .filter((t) => t.direction === "out")
     .reduce((s, t) => s + t.amount, 0)
 
   const totalReceived = transfers
-    .filter((t) => t.type === "received")
+    .filter((t) => t.direction === "in")
     .reduce((s, t) => s + t.amount, 0)
 
-  const scheduled = transfers.filter((t) => t.type === "scheduled")
-  const scheduledTotal = scheduled.reduce((s, t) => s + t.amount, 0)
+  const net = totalReceived - totalSent
 
   const cards = [
     {
@@ -42,11 +41,11 @@ export function TransferStats({ transfers }: TransferStatsProps) {
       bg: "bg-emerald-500/10",
     },
     {
-      label: "Scheduled",
-      value: `${scheduled.length} (${fmt(scheduledTotal)})`,
-      icon: ClockIcon,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
+      label: "Net Flow",
+      value: `${net >= 0 ? "+" : "-"}${fmt(Math.abs(net))}`,
+      icon: ScaleIcon,
+      color: net >= 0 ? "text-emerald-500" : "text-rose-500",
+      bg: net >= 0 ? "bg-emerald-500/10" : "bg-rose-500/10",
     },
   ]
 

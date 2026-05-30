@@ -1,0 +1,419 @@
+- generic [ref=e1]:
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - button "Toggle Sidebar" [ref=e6]:
+          - img
+          - generic [ref=e7]: Toggle Sidebar
+        - separator [ref=e8]
+        - navigation "breadcrumb" [ref=e9]:
+          - list [ref=e10]:
+            - listitem [ref=e11]:
+              - link "Dashboard" [disabled] [ref=e12]
+      - button "Toggle theme" [ref=e14]:
+        - img
+        - generic [ref=e15]: Toggle theme
+    - generic [ref=e16]:
+      - heading "Command Palette" [level=2] [ref=e17]
+      - paragraph [ref=e18]: Search pages, transactions, contacts, and more
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - button "Customize" [ref=e22]:
+          - img
+          - text: Customize
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]:
+              - generic [ref=e31]: Total Available Balance
+              - button "Hide balance" [ref=e32]:
+                - img [ref=e33]
+              - button "Adjust budgets or balances" [ref=e36]:
+                - img [ref=e37]
+            - generic [ref=e41]: ৳2,550.72
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - img [ref=e44]
+              - generic [ref=e49]: Live balance trend
+            - button "Adjust Balance" [ref=e51]:
+              - img
+              - text: Adjust Balance
+            - generic [ref=e52]:
+              - generic [ref=e53] [cursor=pointer]:
+                - img [ref=e54]
+                - generic [ref=e57]:
+                  - text: "Bank Accounts:"
+                  - strong [ref=e58]: ৳740.72
+              - generic [ref=e59] [cursor=pointer]:
+                - img [ref=e60]
+                - generic [ref=e65]:
+                  - text: "Wallet Balance:"
+                  - strong [ref=e66]: ৳1,810.00
+        - generic [ref=e67]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - generic [ref=e73]: Financial Overview
+                - generic [ref=e74]:
+                  - generic [ref=e75]:
+                    - text: Current Year
+                    - generic [ref=e77]: ৳1,170,273
+                  - generic [ref=e78]:
+                    - text: Last Year
+                    - generic [ref=e80]: ৳848,400
+              - button "Jan 2026 - Dec 2026" [ref=e81]:
+                - img
+                - text: Jan 2026 - Dec 2026
+            - application [ref=e86]:
+              - generic [ref=e126]:
+                - generic [ref=e127]:
+                  - generic [ref=e129]: Feb
+                  - generic [ref=e131]: Apr
+                  - generic [ref=e133]: Jun
+                  - generic [ref=e135]: Aug
+                  - generic [ref=e137]: Oct
+                  - generic [ref=e139]: Dec
+                - generic [ref=e140]:
+                  - generic [ref=e142]: ৳0k
+                  - generic [ref=e144]: ৳35k
+                  - generic [ref=e146]: ৳70k
+                  - generic [ref=e148]: ৳105k
+                  - generic [ref=e150]: ৳140k
+          - generic [ref=e154]:
+            - generic [ref=e156]:
+              - button "Red Hot Pay ReddotPay **** 1234 $0.72" [ref=e217] [cursor=pointer]:
+                - generic [ref=e218]:
+                  - generic [ref=e219]: Red Hot Pay
+                  - img "ReddotPay" [ref=e221]
+                - img [ref=e224]
+                - generic [ref=e229]:
+                  - generic [ref=e230]: "**** 1234"
+                  - paragraph [ref=e231]: $0.72
+              - button "UCB Bank (Mastercard) UCB **** 4589 ৳740" [ref=e157] [cursor=pointer]:
+                - generic [ref=e158]:
+                  - generic [ref=e159]: UCB Bank (Mastercard)
+                  - img "UCB" [ref=e161]
+                - img [ref=e164]
+                - generic [ref=e169]:
+                  - generic [ref=e170]: "**** 4589"
+                  - paragraph [ref=e171]: ৳740
+              - button "bKash Personal bKash **** 7890 ৳238" [ref=e172] [cursor=pointer]:
+                - generic [ref=e173]:
+                  - generic [ref=e174]: bKash Personal
+                  - img "bKash" [ref=e176]
+                - img [ref=e179]
+                - generic [ref=e184]:
+                  - generic [ref=e185]: "**** 7890"
+                  - paragraph [ref=e186]: ৳238
+              - button "Nagad Nagad **** 3456 ৳39" [ref=e187] [cursor=pointer]:
+                - generic [ref=e188]:
+                  - generic [ref=e189]: Nagad
+                  - img "Nagad" [ref=e191]
+                - img [ref=e194]
+                - generic [ref=e199]:
+                  - generic [ref=e200]: "**** 3456"
+                  - paragraph [ref=e201]: ৳39
+              - button "DB bill rocket Rocket **** 5678 ৳33" [ref=e202] [cursor=pointer]:
+                - generic [ref=e203]:
+                  - generic [ref=e204]: DB bill rocket
+                  - img "Rocket" [ref=e206]
+                - img [ref=e209]
+                - generic [ref=e214]:
+                  - generic [ref=e215]: "**** 5678"
+                  - paragraph [ref=e216]: ৳33
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - img [ref=e234]
+                - generic [ref=e236]: 5 active accounts
+              - button [ref=e237]:
+                - img
+            - generic [ref=e238]:
+              - paragraph [ref=e239]: Wallet Balance
+              - generic [ref=e241]: ৳1,810.00
+              - generic [ref=e242]:
+                - img [ref=e243]
+                - generic [ref=e246]: Fully synced with transaction ledger
+          - generic [ref=e249]:
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - generic [ref=e252]: Quick Ledger
+                - button "See All Contacts" [ref=e253]:
+                  - text: See All Contacts
+                  - img
+              - generic [ref=e254]:
+                - generic [ref=e255]:
+                  - generic [ref=e256]:
+                    - button "Sarah Chen" [ref=e257]:
+                      - img "Sarah Chen" [ref=e259]
+                    - button "Marcus Johnson" [ref=e260]:
+                      - img "Marcus Johnson" [ref=e262]
+                    - button "Elena Rodriguez" [ref=e263]:
+                      - img "Elena Rodriguez" [ref=e265]
+                    - button "James Wilson" [ref=e266]:
+                      - img "James Wilson" [ref=e268]
+                    - button "Aisha Patel" [ref=e269]:
+                      - img "Aisha Patel" [ref=e271]
+                    - button "David Kim" [ref=e272]:
+                      - img "David Kim" [ref=e274]
+                  - button [ref=e275]:
+                    - img
+                - generic [ref=e276]:
+                  - paragraph [ref=e277]: Lending to Sarah Chen
+                  - generic [ref=e278]:
+                    - generic [ref=e279]: Sending
+                    - switch "Sending" [ref=e280]
+                    - checkbox [ref=e281]
+                - generic [ref=e282]:
+                  - generic [ref=e283]:
+                    - text: Amount (৳)
+                    - generic [ref=e284]:
+                      - generic [ref=e285]: ৳
+                      - textbox [ref=e286]: "250.00"
+                  - button "Record" [ref=e287]:
+                    - img
+                    - text: Record
+            - generic [ref=e288]:
+              - generic [ref=e289]:
+                - generic [ref=e290]:
+                  - generic [ref=e291]: Monthly Spending Limit
+                  - button "Edit Limit" [ref=e292]:
+                    - img [ref=e293]
+                - img [ref=e296]
+              - generic [ref=e299]:
+                - generic [ref=e300]:
+                  - paragraph [ref=e301]: Budget Limit
+                  - generic [ref=e303]: ৳30,000 BDT
+                - progressbar [ref=e304]: x
+                - generic [ref=e307]:
+                  - generic [ref=e308]:
+                    - paragraph [ref=e309]: Current Spent
+                    - paragraph [ref=e310]: ৳27,350
+                  - generic [ref=e311]:
+                    - paragraph [ref=e312]: Remaining
+                    - paragraph [ref=e313]: ৳2,650
+                - paragraph [ref=e314]: May 01 - May 31
+          - generic [ref=e317]:
+            - generic [ref=e318]:
+              - generic [ref=e319]: Money Movement
+              - combobox [ref=e320]:
+                - generic [ref=e321]: 7d
+                - img: ▼
+              - textbox [ref=e322]: 7d
+            - generic [ref=e323]:
+              - generic [ref=e324]:
+                - generic [ref=e325]:
+                  - img [ref=e327]
+                  - generic [ref=e330]:
+                    - paragraph [ref=e331]: Money In
+                    - paragraph [ref=e332]: ৳22,250
+                - generic [ref=e333]:
+                  - img [ref=e335]
+                  - generic [ref=e338]:
+                    - paragraph [ref=e339]: Money Out
+                    - paragraph [ref=e340]: ৳15,340
+              - generic [ref=e341]:
+                - generic [ref=e342]: Net Flow
+                - generic [ref=e343]: +৳6,910
+              - application [ref=e347]:
+                - generic [ref=e400]:
+                  - generic [ref=e401]:
+                    - generic [ref=e403]: Sun
+                    - generic [ref=e405]: Mon
+                    - generic [ref=e407]: Tue
+                    - generic [ref=e409]: Wed
+                    - generic [ref=e411]: Thu
+                    - generic [ref=e413]: Fri
+                    - generic [ref=e415]: Sat
+                  - generic [ref=e416]:
+                    - generic [ref=e418]: ৳0k
+                    - generic [ref=e420]: ৳2k
+                    - generic [ref=e422]: ৳3k
+                    - generic [ref=e424]: ৳5k
+                    - generic [ref=e426]: ৳6k
+          - generic [ref=e429]:
+            - generic [ref=e430]:
+              - generic [ref=e431]:
+                - img [ref=e432]
+                - text: Financial Health
+              - generic [ref=e436]:
+                - img [ref=e437]
+                - text: +3 pts
+            - generic [ref=e441]:
+              - generic [ref=e442]:
+                - img [ref=e444]:
+                  - generic [ref=e447]: "0"
+                  - generic [ref=e448]: "50"
+                  - generic [ref=e449]: "100"
+                - generic [ref=e450]:
+                  - generic [ref=e451]: "78"
+                  - generic [ref=e452]: Good
+              - generic [ref=e454]:
+                - button "Savings Rate 85" [ref=e455]:
+                  - img [ref=e457]
+                  - generic [ref=e460]: Savings Rate
+                  - generic [ref=e461]: "85"
+                  - img [ref=e462]
+                - button "Spending Habits 72" [ref=e464]:
+                  - img [ref=e466]
+                  - generic [ref=e470]: Spending Habits
+                  - generic [ref=e471]: "72"
+                  - img [ref=e472]
+                - button "Debt Ratio 90" [ref=e474]:
+                  - img [ref=e476]
+                  - generic [ref=e478]: Debt Ratio
+                  - generic [ref=e479]: "90"
+                  - img [ref=e480]
+                - button "Investment Growth 68" [ref=e482]:
+                  - img [ref=e484]
+                  - generic [ref=e487]: Investment Growth
+                  - generic [ref=e488]: "68"
+                  - img [ref=e489]
+                - button "Emergency Fund 55" [ref=e491]:
+                  - img [ref=e493]
+                  - generic [ref=e495]: Emergency Fund
+                  - generic [ref=e496]: "55"
+                  - img [ref=e497]
+                - button "Bill Payments 95" [ref=e499]:
+                  - img [ref=e501]
+                  - generic [ref=e504]: Bill Payments
+                  - generic [ref=e505]: "95"
+                  - img [ref=e506]
+          - generic [ref=e510]:
+            - generic [ref=e511]:
+              - generic [ref=e512]: Recent Transactions
+              - link "See All" [ref=e513] [cursor=pointer]:
+                - /url: /transactions
+                - text: See All
+                - img
+            - generic [ref=e516]:
+              - generic [ref=e517]:
+                - generic [ref=e518]: Merchant
+                - generic [ref=e519]: Amount
+              - generic [ref=e521]:
+                - generic [ref=e522]:
+                  - img [ref=e524]
+                  - generic [ref=e527]:
+                    - paragraph [ref=e528]: Emergency fund contribution — May
+                    - generic [ref=e529]: Uncategorized
+                - generic [ref=e530]: "-BDT 15,000.00"
+                - button [ref=e531]:
+                  - img
+              - generic [ref=e532]:
+                - generic [ref=e533]:
+                  - img [ref=e535]
+                  - generic [ref=e538]:
+                    - paragraph [ref=e539]: Family support — Ma
+                    - generic [ref=e540]: Uncategorized
+                - generic [ref=e541]: "-BDT 5,000.00"
+                - button [ref=e542]:
+                  - img
+              - generic [ref=e543]:
+                - generic [ref=e544]:
+                  - img [ref=e546]
+                  - generic [ref=e549]:
+                    - paragraph [ref=e550]: Street food & chai
+                    - generic [ref=e551]: Uncategorized
+                - generic [ref=e552]: "-BDT 850.00"
+                - button [ref=e553]:
+                  - img
+              - generic [ref=e554]:
+                - generic [ref=e555]:
+                  - img [ref=e557]
+                  - generic [ref=e560]:
+                    - paragraph [ref=e561]: Transfer to bKash
+                    - generic [ref=e562]: Uncategorized
+                - generic [ref=e563]: "-BDT 10,000.00"
+                - button [ref=e564]:
+                  - img
+              - generic [ref=e565]:
+                - generic [ref=e566]:
+                  - img [ref=e568]
+                  - generic [ref=e571]:
+                    - paragraph [ref=e572]: Received from Bank
+                    - generic [ref=e573]: Uncategorized
+                - generic [ref=e574]: +BDT 10,000.00
+                - button [ref=e575]:
+                  - img
+              - generic [ref=e576]:
+                - generic [ref=e577]:
+                  - img [ref=e579]
+                  - generic [ref=e582]:
+                    - paragraph [ref=e583]: Uber rides — week 2
+                    - generic [ref=e584]: Uncategorized
+                - generic [ref=e585]: "-BDT 1,200.00"
+                - button [ref=e586]:
+                  - img
+              - generic [ref=e587]:
+                - generic [ref=e588]:
+                  - img [ref=e590]
+                  - generic [ref=e593]:
+                    - paragraph [ref=e594]: Portfolio site for Tanvir
+                    - generic [ref=e595]: Freelance Web Dev
+                - generic [ref=e596]: +BDT 25,000.00
+                - button [ref=e597]:
+                  - img
+        - status [ref=e598]
+    - navigation "Mobile dashboard navigation" [ref=e599]:
+      - generic [ref=e600]:
+        - link "Overview" [ref=e601] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e602]
+          - generic [ref=e607]: Overview
+        - link "Accounts" [ref=e608] [cursor=pointer]:
+          - /url: /accounts
+          - img [ref=e609]
+          - generic [ref=e612]: Accounts
+        - link "Transactions" [ref=e613] [cursor=pointer]:
+          - /url: /transactions
+          - img [ref=e614]
+          - generic [ref=e617]: Transactions
+        - link "Budgets" [ref=e618] [cursor=pointer]:
+          - /url: /budgets
+          - img [ref=e619]
+          - generic [ref=e623]: Budgets
+        - button "Open more dashboard sections" [expanded] [ref=e624]:
+          - img [ref=e625]
+          - generic [ref=e629]: More
+        - menu "Open more dashboard sections" [active] [ref=e654]:
+          - group "More sections" [ref=e655]
+          - group [ref=e656]:
+            - menuitem "Cards" [ref=e657] [cursor=pointer]:
+              - img
+              - generic [ref=e658]: Cards
+            - menuitem "Transfers" [ref=e659] [cursor=pointer]:
+              - img
+              - generic [ref=e660]: Transfers
+            - menuitem "Analytics" [ref=e661] [cursor=pointer]:
+              - img
+              - generic [ref=e662]: Analytics
+            - menuitem "Investments" [ref=e663] [cursor=pointer]:
+              - img
+              - generic [ref=e664]: Investments
+            - menuitem "Crypto" [ref=e665] [cursor=pointer]:
+              - img
+              - generic [ref=e666]: Crypto
+            - menuitem "Notifications" [ref=e667] [cursor=pointer]:
+              - img
+              - generic [ref=e668]: Notifications
+            - menuitem "Settings" [ref=e669] [cursor=pointer]:
+              - img
+              - generic [ref=e670]: Settings
+            - menuitem "Support" [ref=e671] [cursor=pointer]:
+              - img
+              - generic [ref=e672]: Support
+          - separator [ref=e673]
+          - menuitem "Back to overview" [ref=e674] [cursor=pointer]:
+            - img
+            - generic [ref=e675]: Back to overview
+  - generic [ref=e634] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e635]:
+      - img [ref=e636]
+    - generic [ref=e639]:
+      - button "Open issues overlay" [ref=e640]:
+        - generic [ref=e641]:
+          - generic [ref=e642]: "0"
+          - generic [ref=e643]: "1"
+        - generic [ref=e644]: Issue
+      - button "Collapse issues badge" [ref=e645]:
+        - img [ref=e646]
+  - alert [ref=e648]
+  - generic [ref=e649]: ৳0k

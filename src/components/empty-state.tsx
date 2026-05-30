@@ -57,9 +57,9 @@ function WalletIllustration() {
       />
       {/* Floating coins */}
       <motion.circle cx="25" cy="14" r="6" className="fill-amber-400/30 stroke-amber-500/50" strokeWidth="1" animate={{ y: [0, -4, 0] }} transition={{ duration: 2.5, repeat: Infinity }} />
-      <motion.text x="25" y="17" textAnchor="middle" className="fill-amber-600/60 text-[7px] font-bold">$</motion.text>
+      <motion.text x="25" y="17" textAnchor="middle" className="fill-amber-600/60 text-[7px] font-bold">৳</motion.text>
       <motion.circle cx="55" cy="12" r="4.5" className="fill-emerald-400/30 stroke-emerald-500/50" strokeWidth="1" animate={{ y: [0, -3, 0] }} transition={{ duration: 3, delay: 0.5, repeat: Infinity }} />
-      <motion.text x="55" y="14.5" textAnchor="middle" className="fill-emerald-600/60 text-[6px] font-bold">$</motion.text>
+      <motion.text x="55" y="14.5" textAnchor="middle" className="fill-emerald-600/60 text-[6px] font-bold">৳</motion.text>
     </svg>
   )
 }

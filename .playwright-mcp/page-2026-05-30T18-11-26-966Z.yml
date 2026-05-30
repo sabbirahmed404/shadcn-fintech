@@ -1,0 +1,268 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "Shadcn Fintech Finance Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e11]
+          - generic [ref=e13]:
+            - generic [ref=e14]: Shadcn Fintech
+            - generic [ref=e15]: Finance Dashboard
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: Daily
+        - list [ref=e19]:
+          - listitem [ref=e20]:
+            - link "Overview" [ref=e21] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e22]
+              - generic [ref=e27]: Overview
+          - listitem [ref=e28]:
+            - link "Accounts" [ref=e29] [cursor=pointer]:
+              - /url: /accounts
+              - img [ref=e30]
+              - generic [ref=e33]: Accounts
+          - listitem [ref=e34]:
+            - link "Transactions" [ref=e35] [cursor=pointer]:
+              - /url: /transactions
+              - img [ref=e36]
+              - generic [ref=e39]: Transactions
+          - listitem [ref=e40]:
+            - link "Cards" [ref=e41] [cursor=pointer]:
+              - /url: /cards
+              - img [ref=e42]
+              - generic [ref=e44]: Cards
+      - generic [ref=e45]:
+        - generic [ref=e46]: Money
+        - list [ref=e47]:
+          - listitem [ref=e48]:
+            - link "Transfers" [ref=e49] [cursor=pointer]:
+              - /url: /transfers
+              - img [ref=e50]
+              - generic [ref=e53]: Transfers
+          - listitem [ref=e54]:
+            - link "Contacts" [ref=e55] [cursor=pointer]:
+              - /url: /contacts
+              - img [ref=e56]
+              - generic [ref=e61]: Contacts
+          - listitem [ref=e62]:
+            - link "Investments" [ref=e63] [cursor=pointer]:
+              - /url: /investments
+              - img [ref=e64]
+              - generic [ref=e67]: Investments
+          - listitem [ref=e68]:
+            - link "Crypto" [ref=e69] [cursor=pointer]:
+              - /url: /crypto
+              - img [ref=e70]
+              - generic [ref=e72]: Crypto
+      - generic [ref=e73]:
+        - generic [ref=e74]: Insights
+        - list [ref=e75]:
+          - listitem [ref=e76]:
+            - link "Analytics" [ref=e77] [cursor=pointer]:
+              - /url: /analytics
+              - img [ref=e78]
+              - generic [ref=e81]: Analytics
+          - listitem [ref=e82]:
+            - link "Budgets" [ref=e83] [cursor=pointer]:
+              - /url: /budgets
+              - img [ref=e84]
+              - generic [ref=e88]: Budgets
+      - generic [ref=e89]:
+        - generic [ref=e90]: Auth
+        - list [ref=e91]:
+          - listitem [ref=e92]:
+            - link "Sign In" [ref=e93] [cursor=pointer]:
+              - /url: /sign-in
+              - img [ref=e94]
+              - generic [ref=e97]: Sign In
+          - listitem [ref=e98]:
+            - link "Sign Up" [ref=e99] [cursor=pointer]:
+              - /url: /sign-up
+              - img [ref=e100]
+              - generic [ref=e103]: Sign Up
+      - list [ref=e106]:
+        - listitem [ref=e107]:
+          - button "Notifications 6" [ref=e108]:
+            - img [ref=e109]
+            - generic [ref=e112]: Notifications
+            - generic [ref=e113]: "6"
+        - listitem [ref=e114]:
+          - link "Settings" [ref=e115] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e116]
+            - generic [ref=e119]: Settings
+        - listitem [ref=e120]:
+          - link "Help & Support" [ref=e121] [cursor=pointer]:
+            - /url: /support
+            - img [ref=e122]
+            - generic [ref=e129]: Help & Support
+    - list [ref=e131]:
+      - listitem [ref=e132]:
+        - button "AG Abderrahim G. abderrahim@fintech.com" [ref=e133]:
+          - generic [ref=e135]: AG
+          - generic [ref=e136]:
+            - generic [ref=e137]: Abderrahim G.
+            - generic [ref=e138]: abderrahim@fintech.com
+          - img [ref=e139]
+  - main [ref=e142]:
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - button "Toggle Sidebar" [ref=e145]:
+          - img
+          - generic [ref=e146]: Toggle Sidebar
+        - separator [ref=e147]
+        - navigation "breadcrumb" [ref=e148]:
+          - list [ref=e149]:
+            - listitem [ref=e150]:
+              - link "Dashboard" [disabled] [ref=e151]
+      - generic [ref=e152]:
+        - generic:
+          - generic: ⌘
+          - text: K
+        - button "Toggle theme" [ref=e153]:
+          - generic [ref=e154]: Toggle theme
+    - generic [ref=e155]:
+      - heading "Command Palette" [level=2] [ref=e156]
+      - paragraph [ref=e157]: Search pages, transactions, contacts, and more
+    - main [ref=e158]:
+      - generic [ref=e159]:
+        - generic [ref=e165]:
+          - generic [ref=e167]:
+            - generic [ref=e168]: Total Available Balance
+            - button "Hide balance" [ref=e169]:
+              - img [ref=e170]
+            - button "Adjust budgets or balances" [ref=e173]:
+              - img [ref=e174]
+          - generic [ref=e179]:
+            - generic [ref=e182]: Live balance trend
+            - generic [ref=e183]:
+              - button "Expense" [ref=e184]:
+                - img
+                - text: Expense
+              - button "Adjust Balance" [ref=e185]:
+                - img
+                - text: Adjust Balance
+            - generic [ref=e186]:
+              - generic [ref=e187] [cursor=pointer]:
+                - img [ref=e188]
+                - generic [ref=e191]:
+                  - text: "Bank Accounts:"
+                  - strong [ref=e192]: ...
+              - generic [ref=e194] [cursor=pointer]:
+                - img [ref=e195]
+                - generic [ref=e200]:
+                  - text: "Wallet Balance:"
+                  - strong [ref=e201]: ...
+        - generic [ref=e202]:
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]: Financial Overview
+              - generic [ref=e209]:
+                - generic [ref=e210]:
+                  - text: Income
+                  - generic [ref=e212]: ৳0
+                - generic [ref=e213]:
+                  - text: Expenses
+                  - generic [ref=e215]: ৳0
+            - button "Jan 2026 - Dec 2026" [ref=e216]:
+              - img
+              - text: Jan 2026 - Dec 2026
+          - generic [ref=e224]:
+            - generic [ref=e228]:
+              - generic [ref=e229]:
+                - img [ref=e230]
+                - generic [ref=e232]: ... active accounts
+              - button [ref=e233]:
+                - img
+            - generic [ref=e234]:
+              - paragraph [ref=e235]: Wallet Balance
+              - generic [ref=e239]:
+                - img [ref=e240]
+                - generic [ref=e243]: Fully synced with transaction ledger
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - generic [ref=e248]:
+                - generic [ref=e249]: Quick Ledger
+                - link "See All Contacts" [ref=e250] [cursor=pointer]:
+                  - /url: /contacts
+                  - text: See All Contacts
+                  - img
+              - generic [ref=e251]:
+                - generic [ref=e252]:
+                  - paragraph [ref=e254]: No contacts yet.
+                  - link [ref=e255] [cursor=pointer]:
+                    - /url: /contacts
+                    - img
+                - generic [ref=e256]:
+                  - button "Send" [ref=e257]
+                  - button "Lend" [ref=e258]
+                  - button "Borrow" [ref=e259]
+                  - button "Repay" [ref=e260]
+                - paragraph [ref=e262]: Sending to —
+                - generic [ref=e263]:
+                  - button "Send" [ref=e264]:
+                    - img [ref=e265]
+                    - text: Send
+                  - button "Receive" [ref=e267]:
+                    - img [ref=e268]
+                    - text: Receive
+                - generic [ref=e270]:
+                  - generic [ref=e271]:
+                    - text: Amount (৳)
+                    - generic [ref=e272]:
+                      - generic [ref=e273]: ৳
+                      - textbox [ref=e274]: "250.00"
+                  - button "Record" [disabled]:
+                    - img
+                    - text: Record
+            - generic [ref=e275]:
+              - generic [ref=e276]:
+                - generic [ref=e277]:
+                  - generic [ref=e278]: Monthly Spending Limit
+                  - button "Edit Limit" [ref=e279]:
+                    - img [ref=e280]
+                - img [ref=e283]
+              - generic [ref=e286]:
+                - paragraph [ref=e288]: Budget Limit
+                - generic [ref=e292]:
+                  - paragraph [ref=e294]: Current Spent
+                  - paragraph [ref=e297]: Remaining
+                - paragraph [ref=e299]: May 01 - May 31
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - generic [ref=e304]: Money Movement
+              - combobox [ref=e305]:
+                - generic [ref=e306]: 7d
+                - img: ▼
+              - textbox [ref=e307]: 7d
+            - generic [ref=e308]:
+              - generic [ref=e309]:
+                - generic [ref=e310]:
+                  - img [ref=e312]
+                  - generic [ref=e315]:
+                    - paragraph [ref=e316]: Money In
+                    - paragraph [ref=e317]: ৳0
+                - generic [ref=e318]:
+                  - img [ref=e320]
+                  - generic [ref=e323]:
+                    - paragraph [ref=e324]: Money Out
+                    - paragraph [ref=e325]: ৳0
+              - generic [ref=e326]:
+                - generic [ref=e327]: Net Flow
+                - generic [ref=e328]: +৳0
+          - generic [ref=e336]:
+            - img [ref=e337]
+            - text: Financial Health
+          - generic [ref=e352]:
+            - generic [ref=e353]:
+              - generic [ref=e354]: Recent Transactions
+              - link "See All" [ref=e355] [cursor=pointer]:
+                - /url: /transactions
+                - text: See All
+                - img
+            - generic [ref=e359]:
+              - generic [ref=e360]: Merchant
+              - generic [ref=e361]: Transaction ID
+              - generic [ref=e362]: Amount
+              - generic [ref=e363]: Date

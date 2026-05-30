@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3100",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset --local"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -14,6 +18,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "10.0.0-alpha.2",
+    "@supabase/supabase-js": "^2.106.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

@@ -75,7 +75,7 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the dashboard.
+Open [http://localhost:3100](http://localhost:3100) to see the dashboard.
 
 ## Customization
 

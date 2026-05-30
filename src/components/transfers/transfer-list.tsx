@@ -1,58 +1,75 @@
 "use client"
 
-import Image from "next/image"
 import { AnimatePresence, motion } from "motion/react"
-import { XIcon } from "lucide-react"
 import { EmptyState } from "@/components/empty-state"
 
 import { cn } from "@/lib/utils"
-import type { TransferRecord } from "@/data/seed"
+import type { DbTransfer, TransferIntent } from "@/lib/supabase"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface TransferListProps {
-  transfers: TransferRecord[]
-  onCancel: (id: string) => void
+  transfers: DbTransfer[]
+  loading?: boolean
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-BD", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 2,
   }).format(n)
 
-function statusBadge(status: TransferRecord["status"]) {
-  switch (status) {
-    case "completed":
-      return <Badge variant="default">Completed</Badge>
-    case "pending":
-      return (
-        <Badge variant="outline" className="text-amber-500 dark:text-amber-400">
-          Pending
-        </Badge>
-      )
-    case "scheduled":
-      return (
-        <Badge variant="outline" className="text-amber-500 dark:text-amber-400">
-          Scheduled
-        </Badge>
-      )
+const intentLabel: Record<TransferIntent, string> = {
+  send: "Sent",
+  receive: "Received",
+  lend: "Lent",
+  borrow: "Borrowed",
+  repay: "Repaid",
+}
+
+function intentBadge(intent: TransferIntent) {
+  switch (intent) {
+    case "lend":
+      return <Badge variant="outline" className="text-amber-500 dark:text-amber-400">Lent</Badge>
+    case "borrow":
+      return <Badge variant="outline" className="text-violet-500 dark:text-violet-400">Borrowed</Badge>
+    case "repay":
+      return <Badge variant="outline" className="text-blue-500 dark:text-blue-400">Repaid</Badge>
+    case "receive":
+      return <Badge variant="outline" className="text-emerald-500 dark:text-emerald-400">Received</Badge>
+    default:
+      return <Badge variant="default">Sent</Badge>
   }
 }
 
-export function TransferList({ transfers, onCancel }: TransferListProps) {
+export function TransferList({ transfers, loading }: TransferListProps) {
+  if (loading) {
+    return (
+      <div className="overflow-hidden rounded-xl ring-1 ring-foreground/10">
+        <div className="divide-y">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              <Skeleton className="size-10 shrink-0 rounded-full" />
+              <div className="flex-1 space-y-1.5">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <Skeleton className="h-4 w-20" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="overflow-hidden rounded-xl ring-1 ring-foreground/10">
       <div className="divide-y">
         <AnimatePresence mode="popLayout" initial={false}>
           {transfers.length === 0 && (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <EmptyState variant="filter" className="py-10" />
             </motion.div>
           )}
@@ -64,33 +81,23 @@ export function TransferList({ transfers, onCancel }: TransferListProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{
-                duration: 0.2,
-                delay: i * 0.03,
-                layout: { duration: 0.2 },
-              }}
+              transition={{ duration: 0.2, delay: i * 0.03, layout: { duration: 0.2 } }}
               className="group flex items-center gap-3 px-4 py-3"
             >
               {/* Avatar */}
-              <Image
-                src={transfer.contactAvatar}
-                alt={transfer.contactName}
-                width={40}
-                height={40}
-                className="size-10 shrink-0 rounded-full object-cover"
-                unoptimized
-              />
+              <Avatar className="size-10 shrink-0">
+                <AvatarImage src={transfer.contactAvatar ?? undefined} alt={transfer.contactName} />
+                <AvatarFallback className="text-xs">
+                  {transfer.contactName.split(" ").map((n) => n[0]).join("")}
+                </AvatarFallback>
+              </Avatar>
 
               {/* Name + note */}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">
-                  {transfer.contactName}
+                <p className="truncate text-sm font-medium">{transfer.contactName}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {transfer.note ?? intentLabel[transfer.intent]}
                 </p>
-                {transfer.note && (
-                  <p className="truncate text-xs italic text-muted-foreground">
-                    {transfer.note}
-                  </p>
-                )}
               </div>
 
               {/* Amount */}
@@ -98,36 +105,18 @@ export function TransferList({ transfers, onCancel }: TransferListProps) {
                 <p
                   className={cn(
                     "tabular-nums text-sm font-semibold",
-                    transfer.type === "sent" && "text-rose-500",
-                    transfer.type === "received" && "text-emerald-500",
-                    transfer.type === "scheduled" && "text-amber-500"
+                    transfer.direction === "out" ? "text-rose-500" : "text-emerald-500"
                   )}
                 >
-                  {transfer.type === "sent" && "-"}
-                  {transfer.type === "received" && "+"}
+                  {transfer.direction === "out" ? "-" : "+"}
                   {fmt(transfer.amount)}
                 </p>
                 <p className="text-xs text-muted-foreground">{transfer.date}</p>
               </div>
 
-              {/* Status badge */}
-              <div className="hidden shrink-0 sm:block">
-                {statusBadge(transfer.status)}
-              </div>
-
-              {/* Cancel button for scheduled */}
-              <div className="w-16 shrink-0 text-right">
-                {transfer.status === "scheduled" ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 gap-1 text-xs opacity-0 transition-opacity group-hover:opacity-100"
-                    onClick={() => onCancel(transfer.id)}
-                  >
-                    <XIcon className="size-3" />
-                    Cancel
-                  </Button>
-                ) : null}
+              {/* Intent badge */}
+              <div className="hidden w-20 shrink-0 text-right sm:block">
+                {intentBadge(transfer.intent)}
               </div>
             </motion.div>
           ))}

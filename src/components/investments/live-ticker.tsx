@@ -37,7 +37,7 @@ export function LiveTicker() {
       >
         <span className="font-medium">{e.symbol}</span>
         <span className="tabular-nums text-muted-foreground">
-          ${e.price.toFixed(2)}
+          ৳{e.price.toFixed(2)}
         </span>
         <span
           className={cn(

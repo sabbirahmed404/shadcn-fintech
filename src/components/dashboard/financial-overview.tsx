@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { format } from "date-fns"
 import {
   Card,
@@ -22,7 +22,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, type DotProps } from "recharts"
-import { financialOverview } from "@/data/seed"
+import { getMonthlyOverview, type MonthlyOverviewPoint } from "@/lib/supabase"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DateRange } from "react-day-picker"
@@ -43,12 +43,12 @@ function SquareDot({ cx, cy, fill, opacity = 1, size = 6 }: DotProps & { size?: 
 }
 
 const chartConfig = {
-  currentYear: {
-    label: "Current Year",
+  income: {
+    label: "Income",
     color: "var(--color-primary)",
   },
-  lastYear: {
-    label: "Last Year",
+  expenses: {
+    label: "Expenses",
     color: "var(--color-muted-foreground)",
   },
 } satisfies ChartConfig
@@ -64,9 +64,14 @@ export function FinancialOverview() {
     from: new Date(2026, 0, 1),
     to: new Date(2026, 11, 31),
   })
+  const [overview, setOverview] = useState<MonthlyOverviewPoint[]>([])
+
+  useEffect(() => {
+    getMonthlyOverview().then(setOverview)
+  }, [])
 
   const filteredData = useMemo(() => {
-    if (!date?.from || !date?.to) return financialOverview
+    if (!date?.from || !date?.to) return overview
     let fromMonth = date.from.getMonth()
     let toMonth = date.to.getMonth()
     // Ensure at least 3 months are shown for readability
@@ -74,16 +79,16 @@ export function FinancialOverview() {
       fromMonth = Math.max(0, fromMonth - 1)
       toMonth = Math.min(11, toMonth + 1)
     }
-    return financialOverview.filter((d) => {
+    return overview.filter((d) => {
       const m = monthIndex[d.month]
       return m >= fromMonth && m <= toMonth
     })
-  }, [date])
+  }, [date, overview])
 
   const totals = useMemo(() => {
-    const current = filteredData.reduce((s, d) => s + d.currentYear, 0)
-    const last = filteredData.reduce((s, d) => s + d.lastYear, 0)
-    return { current, last }
+    const income = filteredData.reduce((s, d) => s + d.income, 0)
+    const expenses = filteredData.reduce((s, d) => s + d.expenses, 0)
+    return { income, expenses }
   }, [filteredData])
 
   return (
@@ -96,16 +101,16 @@ export function FinancialOverview() {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-primary" />
-              Current Year{" "}
+              Income{" "}
               <span className="font-medium text-foreground">
-                ${totals.current.toLocaleString()}
+                ৳{totals.income.toLocaleString()}
               </span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-muted-foreground/40" />
-              Last Year{" "}
+              Expenses{" "}
               <span className="font-medium text-foreground">
-                ${totals.last.toLocaleString()}
+                ৳{totals.expenses.toLocaleString()}
               </span>
             </span>
           </div>
@@ -186,20 +191,20 @@ export function FinancialOverview() {
               fontSize={12}
               tickMargin={8}
               stroke="var(--color-muted-foreground)"
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v) => `৳${(v / 1000).toFixed(0)}k`}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   labelFormatter={(label) => label}
                   formatter={(value) =>
-                    `$${Number(value).toLocaleString()}`
+                    `৳${Number(value).toLocaleString()}`
                   }
                 />
               }
             />
             <Area
-              dataKey="lastYear"
+              dataKey="expenses"
               type="linear"
               stroke="var(--color-muted-foreground)"
               strokeOpacity={0.3}
@@ -208,7 +213,7 @@ export function FinancialOverview() {
               dot={<SquareDot fill="var(--color-muted-foreground)" opacity={0.3} size={5} />}
             />
             <Area
-              dataKey="currentYear"
+              dataKey="income"
               type="linear"
               stroke="var(--color-primary)"
               strokeWidth={2}

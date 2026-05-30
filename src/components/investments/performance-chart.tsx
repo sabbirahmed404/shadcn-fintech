@@ -92,14 +92,14 @@ export function PerformanceChart() {
               tickLine={false}
               axisLine={false}
               width={50}
-              tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v: number) => `৳${(v / 1000).toFixed(0)}k`}
               tick={{ fontSize: 11 }}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   formatter={(value) =>
-                    `$${Number(value).toLocaleString()}`
+                    `৳${Number(value).toLocaleString()}`
                   }
                 />
               }

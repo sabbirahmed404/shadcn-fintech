@@ -115,7 +115,7 @@ export function PortfolioAllocation() {
               dominantBaseline="middle"
               className="fill-foreground text-xl font-bold tabular-nums"
             >
-              ${centerLabel.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              ৳{centerLabel.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </text>
             {centerLabel.pct && (
               <text

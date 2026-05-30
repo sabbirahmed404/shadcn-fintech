@@ -33,7 +33,7 @@ export function TradeForm({ prices }: TradeFormProps) {
   const [activeTab, setActiveTab] = React.useState<string>("Trade")
   const [amount, setAmount] = React.useState("0.5")
   const [fromCoin, setFromCoin] = React.useState("eth")
-  const [toCoin, setToCoin] = React.useState("usd")
+  const [toCoin, setToCoin] = React.useState("bdt")
   const [loading, setLoading] = React.useState(false)
   const [success, setSuccess] = React.useState(false)
   const [successDetail, setSuccessDetail] = React.useState("")
@@ -41,8 +41,8 @@ export function TradeForm({ prices }: TradeFormProps) {
   const isBuyMode = activeTab === "Buy"
   const isSellMode = activeTab === "Sell"
 
-  // For Buy mode: amount is in USD, fromCoin is "usd", toCoin is a crypto
-  // For Sell mode: amount is in crypto, fromCoin is crypto, toCoin is "usd"
+  // For Buy mode: amount is in BDT, fromCoin is "bdt", toCoin is a crypto
+  // For Sell mode: amount is in crypto, fromCoin is crypto, toCoin is "bdt"
   // For Exchange/Trade: amount is from crypto, converted to toCoin
 
   const fromPrice = prices[fromCoin] ?? 0
@@ -53,20 +53,20 @@ export function TradeForm({ prices }: TradeFormProps) {
     if (val <= 0) return "0.00"
 
     if (isBuyMode) {
-      // USD -> crypto: val USD / crypto price
+      // BDT -> crypto: val BDT / crypto price
       const cryptoPrice = prices[toCoin] ?? 0
       if (cryptoPrice <= 0) return "0.00"
       return (val / cryptoPrice).toFixed(6)
     }
 
     if (isSellMode) {
-      // Crypto -> USD: val * crypto price
+      // Crypto -> BDT: val * crypto price
       const cryptoPrice = prices[fromCoin] ?? 0
       return (val * cryptoPrice).toFixed(2)
     }
 
-    // Exchange/Trade: crypto -> crypto or crypto -> usd
-    if (toCoin === "usd") {
+    // Exchange/Trade: crypto -> crypto or crypto -> bdt
+    if (toCoin === "bdt") {
       return (val * fromPrice).toFixed(2)
     }
     if (fromPrice <= 0 || toPrice <= 0) return "0.00"
@@ -76,14 +76,14 @@ export function TradeForm({ prices }: TradeFormProps) {
   // Adapt form fields when tab changes
   React.useEffect(() => {
     if (isBuyMode) {
-      setFromCoin("usd")
-      if (toCoin === "usd") setToCoin("btc")
+      setFromCoin("bdt")
+      if (toCoin === "bdt") setToCoin("btc")
     } else if (isSellMode) {
-      if (fromCoin === "usd") setFromCoin("eth")
-      setToCoin("usd")
+      if (fromCoin === "bdt") setFromCoin("eth")
+      setToCoin("bdt")
     } else {
-      if (fromCoin === "usd") setFromCoin("eth")
-      if (toCoin === fromCoin) setToCoin("usd")
+      if (fromCoin === "bdt") setFromCoin("eth")
+      if (toCoin === fromCoin) setToCoin("bdt")
     }
   // Only run when tab changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,8 +97,8 @@ export function TradeForm({ prices }: TradeFormProps) {
       setLoading(false)
       setSuccess(true)
 
-      const fromLabel = fromCoin === "usd" ? "USD" : (cryptoCoins.find((c) => c.id === fromCoin)?.symbol ?? fromCoin.toUpperCase())
-      const toLabel = toCoin === "usd" ? "USD" : (cryptoCoins.find((c) => c.id === toCoin)?.symbol ?? toCoin.toUpperCase())
+      const fromLabel = fromCoin === "bdt" ? "BDT" : (cryptoCoins.find((c) => c.id === fromCoin)?.symbol ?? fromCoin.toUpperCase())
+      const toLabel = toCoin === "bdt" ? "BDT" : (cryptoCoins.find((c) => c.id === toCoin)?.symbol ?? toCoin.toUpperCase())
       setSuccessDetail(`${val} ${fromLabel} -> ${converted} ${toLabel}`)
 
       setTimeout(() => {
@@ -111,12 +111,12 @@ export function TradeForm({ prices }: TradeFormProps) {
   function handleSwap() {
     const prevFrom = fromCoin
     const prevTo = toCoin
-    setFromCoin(prevTo === "usd" ? "btc" : prevTo)
+    setFromCoin(prevTo === "bdt" ? "btc" : prevTo)
     setToCoin(prevFrom)
   }
 
-  const amountLabel = isBuyMode ? "Amount (USD)" : isSellMode ? "Amount (Crypto)" : "Amount"
-  const receivedLabel = isBuyMode ? "You Receive" : isSellMode ? "You Receive (USD)" : "Received"
+  const amountLabel = isBuyMode ? "Amount (BDT)" : isSellMode ? "Amount (Crypto)" : "Amount"
+  const receivedLabel = isBuyMode ? "You Receive" : isSellMode ? "You Receive (BDT)" : "Received"
 
   return (
     <Card className="lg:col-span-4">
@@ -159,7 +159,7 @@ export function TradeForm({ prices }: TradeFormProps) {
               className="h-10 border-0 bg-transparent px-0 text-base font-semibold tabular-nums shadow-none focus-visible:ring-0"
             />
             {isBuyMode ? (
-              <span className="shrink-0 text-sm font-medium text-muted-foreground px-2">USD</span>
+              <span className="shrink-0 text-sm font-medium text-muted-foreground px-2">BDT</span>
             ) : (
               <Select value={fromCoin} onValueChange={(v) => v && setFromCoin(v)} disabled={loading || success}>
                 <SelectTrigger size="sm" className="w-auto shrink-0 border-0 bg-transparent shadow-none">
@@ -200,14 +200,14 @@ export function TradeForm({ prices }: TradeFormProps) {
               {converted}
             </p>
             {isSellMode ? (
-              <span className="shrink-0 text-sm font-medium text-muted-foreground px-2">USD</span>
+              <span className="shrink-0 text-sm font-medium text-muted-foreground px-2">BDT</span>
             ) : (
               <Select value={toCoin} onValueChange={(v) => v && setToCoin(v)} disabled={loading || success}>
                 <SelectTrigger size="sm" className="w-auto shrink-0 border-0 bg-transparent shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {!isBuyMode && <SelectItem value="usd">USD</SelectItem>}
+                  {!isBuyMode && <SelectItem value="bdt">BDT</SelectItem>}
                   {cryptoCoins.map((coin) => (
                     <SelectItem key={coin.id} value={coin.id}>
                       {coin.symbol}
