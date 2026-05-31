@@ -2,13 +2,16 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import {
+  AlertTriangleIcon,
   BriefcaseIcon,
   CalendarIcon,
   CarIcon,
+  CheckCircle2Icon,
   GraduationCapIcon,
   HeartIcon,
   HistoryIcon,
   HomeIcon,
+  InfoIcon,
   Loader2Icon,
   MonitorIcon,
   MoreHorizontalIcon,
@@ -81,6 +84,8 @@ const ICON_OPTIONS = [
   { name: "briefcase", label: "Business" },
   { name: "target", label: "Goal" },
 ]
+
+// Backward-compatible alias removed to prevent ReferenceError in Turbopack
 
 const iconMap: Record<string, ReactNode> = {
   "piggy-bank": <PiggyBankIcon className="size-5" />,
@@ -470,6 +475,52 @@ function GoalEditorDialog({
 }) {
   const title = mode === "edit" ? "Edit Goal" : "Create Goal"
 
+  // Dynamic monthly insight: compute required monthly, months left, on-track status
+  const insight = useMemo(() => {
+    const target = parseCurrencyAmount(form.targetAmount) ?? 0
+    const current = parseCurrencyAmount(form.currentAmount) ?? 0
+    const monthly = parseCurrencyAmount(form.monthlyContribution) ?? 0
+    const remaining = Math.max(target - current, 0)
+
+    if (target <= 0 || remaining <= 0) {
+      return { show: false } as const
+    }
+
+    // Calculate months to deadline
+    let monthsToDeadline: number | null = null
+    if (form.targetDate) {
+      const now = new Date()
+      const deadline = new Date(`${form.targetDate}T23:59:59`)
+      monthsToDeadline = Math.max(
+        (deadline.getFullYear() - now.getFullYear()) * 12 +
+          (deadline.getMonth() - now.getMonth()),
+        1
+      )
+    }
+
+    // Required monthly to meet deadline
+    const requiredMonthly = monthsToDeadline ? Math.ceil(remaining / monthsToDeadline) : null
+
+    // Months needed at current monthly rate
+    const monthsNeeded = monthly > 0 ? Math.ceil(remaining / monthly) : null
+
+    // On-track?
+    const isOnTrack =
+      monthsToDeadline !== null && monthsNeeded !== null
+        ? monthsNeeded <= monthsToDeadline
+        : null
+
+    return {
+      show: true,
+      remaining,
+      monthsToDeadline,
+      requiredMonthly,
+      monthsNeeded,
+      monthly,
+      isOnTrack,
+    } as const
+  }, [form.targetAmount, form.currentAmount, form.monthlyContribution, form.targetDate])
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
@@ -532,6 +583,72 @@ function GoalEditorDialog({
             </div>
           </div>
 
+          {/* Dynamic Monthly Insight Panel */}
+          {insight.show && (
+            <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/30 p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <InfoIcon className="size-3.5" />
+                Goal Insights
+              </div>
+              <div className="grid gap-2 text-sm sm:grid-cols-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs text-muted-foreground">Remaining</span>
+                  <span className="font-semibold tabular-nums">{formatCurrency(insight.remaining)}</span>
+                </div>
+                {insight.monthsNeeded !== null && insight.monthly > 0 && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Months at current rate</span>
+                    <span className="font-semibold tabular-nums">
+                      {insight.monthsNeeded} {insight.monthsNeeded === 1 ? "month" : "months"}
+                    </span>
+                  </div>
+                )}
+                {insight.requiredMonthly !== null && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Required monthly to meet target</span>
+                    <span className="font-semibold tabular-nums text-primary">
+                      {formatCurrency(insight.requiredMonthly)}/mo
+                    </span>
+                  </div>
+                )}
+                {insight.monthsToDeadline !== null && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground">Months to deadline</span>
+                    <span className="font-semibold tabular-nums">
+                      {insight.monthsToDeadline} {insight.monthsToDeadline === 1 ? "month" : "months"}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {insight.isOnTrack !== null && (
+                <div
+                  className={cn(
+                    "mt-1 flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold",
+                    insight.isOnTrack
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  )}
+                >
+                  {insight.isOnTrack ? (
+                    <>
+                      <CheckCircle2Icon className="size-3.5" />
+                      You&apos;re on track to reach your goal!
+                    </>
+                  ) : (
+                    <>
+                      <AlertTriangleIcon className="size-3.5" />
+                      You may fall behind — consider increasing to{" "}
+                      {insight.requiredMonthly !== null
+                        ? formatCurrency(insight.requiredMonthly)
+                        : "a higher amount"}{" "}
+                      per month.
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col gap-2">
             <Label>Icon</Label>
             <div className="grid grid-cols-6 gap-2 sm:grid-cols-12">
@@ -541,6 +658,10 @@ function GoalEditorDialog({
                   type="button"
                   size="icon"
                   variant={form.icon === option.name ? "secondary" : "outline"}
+                  className={cn(
+                    form.icon === option.name &&
+                      "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                  )}
                   title={option.label}
                   onClick={() => onChange({ ...form, icon: option.name })}
                 >
@@ -601,7 +722,7 @@ function ContributionHistoryDialog({
     queueMicrotask(() => {
       setEditingContribution(null)
       setForm({
-        amount: "",
+        amount: goal.monthly_contribution > 0 ? String(goal.monthly_contribution) : "",
         contributedAt: normalizeDateInput(new Date()) || "",
         notes: "",
       })

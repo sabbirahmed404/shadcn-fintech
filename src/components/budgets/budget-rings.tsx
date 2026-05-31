@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { motion } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -48,6 +48,7 @@ import {
   LandmarkIcon,
   LaptopIcon,
   LightbulbIcon,
+  CalendarCheckIcon,
   Loader2Icon,
   MusicIcon,
   PaintbrushIcon,
@@ -75,6 +76,7 @@ import {
   addBudgetCategoryItem,
   createBudgetCategoryItem,
   deleteBudgetCategoryItem,
+  isBudgetSetForCurrentMonth,
   moveBudgetCategoryItem,
   normalizeBudgetCategorySettings,
   toBudgetCategorySettings,
@@ -190,6 +192,18 @@ type CategoryBudgetData = BudgetCategoryItem & {
   spent: number
 }
 
+function formatCompactBudget(amount: number): string {
+  if (amount >= 100000) return `৳${(amount / 1000).toFixed(0)}K`
+  if (amount >= 10000) return `৳${(amount / 1000).toFixed(1)}K`.replace(".0K", "K")
+  if (amount >= 1000) return `৳${(amount / 1000).toFixed(1)}K`.replace(".0K", "K")
+  return `৳${amount}`
+}
+
+function getMonthLabel(): string {
+  const now = new Date()
+  return now.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+}
+
 function BudgetIcon({
   name,
   className,
@@ -237,8 +251,8 @@ function validateBudgetItems(items: BudgetCategoryItem[]) {
       throw new Error(`"${name}" is already in your budget categories.`)
     }
 
-    if (!Number.isFinite(budget) || budget <= 0) {
-      throw new Error(`"${name}" needs a budget greater than 0.`)
+    if (!Number.isFinite(budget) || budget < 0) {
+      throw new Error(`"${name}" needs a budget of 0 or greater.`)
     }
 
     names.add(normalizedName)
@@ -285,9 +299,13 @@ async function loadBudgetData() {
       Math.round(nextSpentByCategory[category] * 100) / 100
   })
 
+  const rawSettings = budgetSettings.category_budgets
+  const budgetSetForMonth = isBudgetSetForCurrentMonth(rawSettings)
+
   return {
-    budgetItems: normalizeBudgetCategorySettings(budgetSettings.category_budgets),
+    budgetItems: normalizeBudgetCategorySettings(rawSettings),
     spentByCategory: nextSpentByCategory,
+    budgetSetForMonth,
   }
 }
 
@@ -295,6 +313,8 @@ export function BudgetRings() {
   const [categories, setCategories] = useState<CategoryBudgetData[]>([])
   const [spentByCategory, setSpentByCategory] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [budgetSetForMonth, setBudgetSetForMonth] = useState(false)
+  const [recentlyUpdatedId, setRecentlyUpdatedId] = useState<string | null>(null)
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState("")
@@ -317,6 +337,7 @@ export function BudgetRings() {
       setCategories(
         buildCategoryData(nextData.budgetItems, nextData.spentByCategory)
       )
+      setBudgetSetForMonth(nextData.budgetSetForMonth)
       setIsLoading(false)
     }
 
@@ -327,17 +348,24 @@ export function BudgetRings() {
     }
   }, [])
 
-  const persistBudgetItems = async (items: BudgetCategoryItem[]) => {
+  const persistBudgetItems = useCallback(async (items: BudgetCategoryItem[], updatedCategoryId?: string) => {
     const success = await updateCategoryBudgetSettings(
       toBudgetCategorySettings(items)
     )
 
     if (success) {
       setCategories(buildCategoryData(items, spentByCategory))
+      setBudgetSetForMonth(true)
+
+      // Flash the updated ring so the user sees which one changed
+      if (updatedCategoryId) {
+        setRecentlyUpdatedId(updatedCategoryId)
+        setTimeout(() => setRecentlyUpdatedId(null), 2000)
+      }
     }
 
     return success
-  }
+  }, [spentByCategory])
 
   const openEditDialog = (categoryId: string) => {
     setSelectedCategoryId(categoryId)
@@ -359,13 +387,13 @@ export function BudgetRings() {
 
   const handleSaveBudget = async () => {
     const amount = parseFloat(newBudgetVal)
-    if (Number.isNaN(amount) || amount <= 0 || !selectedCategory) return
+    if (Number.isNaN(amount) || amount < 0 || !selectedCategory) return
 
     setIsSaving(true)
     const updatedItems = toBudgetItems(categories).map((category) =>
       category.id === selectedCategory.id ? { ...category, budget: amount } : category
     )
-    const success = await persistBudgetItems(updatedItems)
+    const success = await persistBudgetItems(updatedItems, selectedCategory.id)
     setIsSaving(false)
 
     if (success) {
@@ -446,17 +474,31 @@ export function BudgetRings() {
     }
   }
 
+  const totalAllocated = categories.reduce((acc, cat) => acc + (cat.budget || 0), 0)
+
   return (
     <>
       <Card className="col-span-full overflow-hidden border-border/40 backdrop-blur-md">
         <CardHeader className="flex flex-row items-center justify-between gap-3 pb-2">
           <div className="flex flex-col gap-1">
-            <CardTitle className="text-base font-semibold">
-              Monthly Category Budgets
-            </CardTitle>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              Click any ring to adjust
-            </span>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-semibold">
+                Monthly Category Budgets
+              </CardTitle>
+              <span className="rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                {getMonthLabel()}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                Click any ring to adjust
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">•</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                Total Allocated: ৳{totalAllocated.toLocaleString()}
+              </span>
+
+            </div>
           </div>
           <Button
             variant="outline"
@@ -482,20 +524,29 @@ export function BudgetRings() {
           ) : (
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               {categories.map((category, index) => {
-                const percent = Math.min(
-                  (category.spent / (category.budget || 1)) * 100,
-                  100
-                )
+                const hasSpending = category.spent > 0
+                const percent = hasSpending
+                  ? Math.min(
+                      (category.spent / (category.budget || 1)) * 100,
+                      100
+                    )
+                  : 0
                 const offset = CIRCUMFERENCE - (percent / 100) * CIRCUMFERENCE
                 const isOver = category.spent > category.budget
+                const isJustUpdated = recentlyUpdatedId === category.id
 
                 return (
-                  <button
+                  <motion.button
                     key={category.id}
                     type="button"
                     onClick={() => openEditDialog(category.id)}
-                    className="group flex flex-col items-center gap-2 rounded-lg outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
+                    className={cn(
+                      "group flex flex-col items-center gap-2 rounded-lg outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50",
+                      isJustUpdated && "ring-2 ring-emerald-500/50 ring-offset-2 ring-offset-background"
+                    )}
                     title={`Click to adjust ${category.name} budget`}
+                    animate={isJustUpdated ? { scale: [1, 1.08, 1] } : {}}
+                    transition={{ duration: 0.4 }}
                   >
                     <span className="relative size-24">
                       <svg viewBox="0 0 100 100" className="size-full -rotate-90">
@@ -538,11 +589,16 @@ export function BudgetRings() {
                       </svg>
                       <span
                         className={cn(
-                          "absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-110",
+                          "absolute inset-0 flex flex-col items-center justify-center gap-0.5 transition-transform group-hover:scale-110",
                           isOver ? "text-destructive animate-pulse" : category.color
                         )}
                       >
-                        <BudgetIcon name={category.icon} className="size-5" />
+                        <BudgetIcon name={category.icon} className="size-4" />
+                        {!hasSpending && (
+                          <span className="text-[9px] font-bold tabular-nums opacity-70">
+                            {formatCompactBudget(category.budget)}
+                          </span>
+                        )}
                       </span>
                     </span>
                     <span className="text-center">
@@ -550,13 +606,26 @@ export function BudgetRings() {
                         {category.name}
                       </span>
                       <span className="block text-[10px] font-bold tabular-nums text-muted-foreground/80">
-                        ৳{category.spent.toLocaleString()}{" "}
-                        <span className="font-normal text-muted-foreground/50">
-                          / ৳{category.budget.toLocaleString()}
-                        </span>
+                        {hasSpending ? (
+                          <>
+                            ৳{category.spent.toLocaleString()}{" "}
+                            <span className="font-normal text-muted-foreground/50">
+                              / ৳{category.budget.toLocaleString()}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className={cn("font-semibold", category.color)}>
+                              ৳{category.budget.toLocaleString()}
+                            </span>
+                            <span className="font-normal text-muted-foreground/50">
+                              {" "}allocated
+                            </span>
+                          </>
+                        )}
                       </span>
                     </span>
-                  </button>
+                  </motion.button>
                 )
               })}
             </div>
@@ -612,27 +681,41 @@ export function BudgetRings() {
                   </div>
                 </div>
 
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
-                    disabled={isSaving}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveBudget}
-                    disabled={isSaving || !newBudgetVal}
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2Icon data-icon="inline-start" className="animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      "Apply Budget"
-                    )}
-                  </Button>
+                <DialogFooter className="flex-col sm:flex-row gap-2">
+                  <div className="flex w-full gap-2">
+                    <Button
+                      variant="destructive"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        setNewBudgetVal("0")
+                      }}
+                      disabled={isSaving}
+                    >
+                      Unallocate
+                    </Button>
+                  </div>
+                  <div className="flex w-full gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                      disabled={isSaving}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSaveBudget}
+                      disabled={isSaving || newBudgetVal === ""}
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2Icon data-icon="inline-start" className="animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Apply Budget"
+                      )}
+                    </Button>
+                  </div>
                 </DialogFooter>
               </>
             )}

@@ -50,7 +50,12 @@ export function MonthProjection() {
     let totalSpent = 0
 
     for (const t of transactions) {
-      if (t.direction === "out" && t.occurred_at.startsWith(currentMonthPrefix)) {
+      if (
+        t.direction === "out" && 
+        t.type !== "transfer" && 
+        t.type !== "goal_contribution" && 
+        t.occurred_at.startsWith(currentMonthPrefix)
+      ) {
         const dayStr = t.occurred_at.split('T')[0].split('-')[2]
         const day = parseInt(dayStr, 10)
         dailySpendMap.set(day, (dailySpendMap.get(day) || 0) + t.amount)

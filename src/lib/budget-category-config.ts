@@ -9,6 +9,7 @@ export type BudgetCategoryItem = {
 export type BudgetCategorySettings = {
   version: 2
   items: BudgetCategoryItem[]
+  last_budget_month?: string
 }
 
 export const DEFAULT_BUDGET_ITEMS: BudgetCategoryItem[] = [
@@ -118,7 +119,7 @@ function assertValidName(name: string, items: BudgetCategoryItem[], itemId?: str
 
 function normalizeBudget(value: unknown, fallback: number) {
   const budget = Number(value)
-  return Number.isFinite(budget) && budget > 0 ? budget : fallback
+  return Number.isFinite(budget) && budget >= 0 ? budget : fallback
 }
 
 function normalizeItem(
@@ -176,10 +177,32 @@ export function normalizeBudgetCategorySettings(settings: unknown): BudgetCatego
   }))
 }
 
+export function getCurrentBudgetMonth(): string {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+}
+
+export function extractLastBudgetMonth(settings: unknown): string | null {
+  if (
+    isRecord(settings) &&
+    typeof settings.last_budget_month === "string" &&
+    settings.last_budget_month.trim()
+  ) {
+    return settings.last_budget_month.trim()
+  }
+  return null
+}
+
+export function isBudgetSetForCurrentMonth(settings: unknown): boolean {
+  const lastMonth = extractLastBudgetMonth(settings)
+  return lastMonth === getCurrentBudgetMonth()
+}
+
 export function toBudgetCategorySettings(items: BudgetCategoryItem[]): BudgetCategorySettings {
   return {
     version: 2,
     items: items.map((item) => ({ ...item })),
+    last_budget_month: getCurrentBudgetMonth(),
   }
 }
 

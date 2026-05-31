@@ -19,10 +19,13 @@ export function SpendingCalendar() {
   })
 
   const { weeks, maxAmount, monthName, year } = useMemo(() => {
-    // Group transactions by date
     const map = new Map<string, number>()
     for (const t of transactions) {
-      if (t.direction === "out") {
+      if (
+        t.direction === "out" && 
+        t.type !== "transfer" && 
+        t.type !== "goal_contribution"
+      ) {
         const dStr = t.occurred_at.split("T")[0]
         map.set(dStr, (map.get(dStr) || 0) + t.amount)
       }
