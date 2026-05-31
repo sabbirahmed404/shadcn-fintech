@@ -273,7 +273,9 @@ export function ContactsPageClient() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{contact.name}</p>
                         {contact.nickname && (
-                          <p className="truncate text-xs text-muted-foreground">"{contact.nickname}"</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            &quot;{contact.nickname}&quot;
+                          </p>
                         )}
                         {contact.phone && (
                           <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
@@ -302,13 +304,13 @@ export function ContactsPageClient() {
                           <span className="sr-only">Contact actions</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onSelect={() => openEdit(contact)}>
+                          <DropdownMenuItem onClick={() => openEdit(contact)}>
                             <PencilIcon className="size-4" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             variant="destructive"
-                            onSelect={() => setDeleteTarget(contact)}
+                            onClick={() => setDeleteTarget(contact)}
                           >
                             <Trash2Icon className="size-4" />
                             Delete
