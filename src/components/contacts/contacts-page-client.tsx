@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
+import imageCompression from "browser-image-compression"
 import {
   PlusIcon,
   PencilIcon,
@@ -11,6 +12,8 @@ import {
   UsersIcon,
   UploadIcon,
   MoreVerticalIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -50,7 +53,6 @@ import {
 const fmt = (n: number) => `৳${Math.abs(n).toLocaleString("en-BD", { minimumFractionDigits: 2 })}`
 
 const AVATAR_PRESETS = CARTOON_AVATARS
-const MAX_AVATAR_BYTES = 1_500_000 // ~1.5 MB
 
 type FormState = {
   name: string
@@ -121,25 +123,28 @@ export function ContactsPageClient() {
     setDialogOpen(true)
   }
 
-  function handleAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    e.target.value = "" // allow re-selecting the same file later
+    e.target.value = ""
     if (!file) return
     if (!file.type.startsWith("image/")) {
       setAvatarError("Please choose an image file.")
       return
     }
-    if (file.size > MAX_AVATAR_BYTES) {
-      setAvatarError("Image is too large (max 1.5 MB).")
-      return
+    setAvatarError(null)
+    try {
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      })
+      const reader = new FileReader()
+      reader.onload = () => setForm((f) => ({ ...f, avatar_url: String(reader.result) }))
+      reader.onerror = () => setAvatarError("Could not read that file.")
+      reader.readAsDataURL(compressed)
+    } catch {
+      setAvatarError("Could not process that image.")
     }
-    const reader = new FileReader()
-    reader.onload = () => {
-      setAvatarError(null)
-      setForm((f) => ({ ...f, avatar_url: String(reader.result) }))
-    }
-    reader.onerror = () => setAvatarError("Could not read that file.")
-    reader.readAsDataURL(file)
   }
 
   async function handleSave() {
@@ -207,7 +212,7 @@ export function ContactsPageClient() {
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-              <span className="text-sm font-bold text-emerald-500">↘</span>
+              <TrendingDownIcon className="size-4 text-emerald-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Owed to you</p>
@@ -220,7 +225,7 @@ export function ContactsPageClient() {
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-500/10">
-              <span className="text-sm font-bold text-rose-500">↗</span>
+              <TrendingUpIcon className="size-4 text-rose-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">You owe</p>
@@ -389,7 +394,7 @@ export function ContactsPageClient() {
                     <UploadIcon className="size-3.5" />
                     Upload image
                   </Button>
-                  <p className="text-[11px] text-muted-foreground">PNG or JPG, up to 1.5 MB.</p>
+                  <p className="text-[11px] text-muted-foreground">Any image — auto-compressed.</p>
                 </div>
                 <input
                   ref={fileInputRef}
