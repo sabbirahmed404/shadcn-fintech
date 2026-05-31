@@ -15,6 +15,7 @@ import {
   SettingsIcon,
   TargetIcon,
   TrendingUpIcon,
+  UsersIcon,
   WalletIcon,
   type LucideIcon,
 } from "lucide-react"
@@ -49,6 +50,7 @@ const moreItems: MobileNavItem[] = [
   { title: "Analytics", href: "/analytics", icon: ChartAreaIcon },
   { title: "Investments", href: "/investments", icon: TrendingUpIcon },
   { title: "Crypto", href: "/crypto", icon: BitcoinIcon },
+  { title: "Contacts", href: "/contacts", icon: UsersIcon },
   { title: "Notifications", href: "/notifications", icon: BellIcon },
   { title: "Settings", href: "/settings", icon: SettingsIcon },
   { title: "Support", href: "/support", icon: HelpCircleIcon },
