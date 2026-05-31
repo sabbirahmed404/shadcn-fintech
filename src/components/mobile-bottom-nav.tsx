@@ -15,6 +15,7 @@ import {
   SettingsIcon,
   TargetIcon,
   TrendingUpIcon,
+  UsersIcon,
   WalletIcon,
   type LucideIcon,
 } from "lucide-react"
@@ -44,6 +45,7 @@ const primaryItems: MobileNavItem[] = [
 ]
 
 const moreItems: MobileNavItem[] = [
+  { title: "Contacts", href: "/contacts", icon: UsersIcon },
   { title: "Cards", href: "/cards", icon: CreditCardIcon },
   { title: "Transfers", href: "/transfers", icon: SendIcon },
   { title: "Analytics", href: "/analytics", icon: ChartAreaIcon },
