@@ -10,6 +10,7 @@ import {
   LoaderCircleIcon,
   UsersIcon,
   UploadIcon,
+  MoreVerticalIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/empty-state"
 import { cn } from "@/lib/utils"
@@ -255,7 +262,7 @@ export function ContactsPageClient() {
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <Card className="group h-full">
+                  <Card className="h-full">
                     <CardContent className="flex items-start gap-3 p-4">
                       <Avatar className="size-11 shrink-0">
                         <AvatarImage src={contact.avatar_url ?? undefined} alt={contact.name} />
@@ -266,7 +273,7 @@ export function ContactsPageClient() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{contact.name}</p>
                         {contact.nickname && (
-                          <p className="truncate text-xs text-muted-foreground">“{contact.nickname}”</p>
+                          <p className="truncate text-xs text-muted-foreground">"{contact.nickname}"</p>
                         )}
                         {contact.phone && (
                           <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
@@ -287,24 +294,27 @@ export function ContactsPageClient() {
                           </span>
                         )}
                       </div>
-                      <div className="flex shrink-0 flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          onClick={() => openEdit(contact)}
-                        >
-                          <PencilIcon className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-rose-500 hover:text-rose-600"
-                          onClick={() => setDeleteTarget(contact)}
-                        >
-                          <Trash2Icon className="size-3.5" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-7 shrink-0">
+                            <MoreVerticalIcon className="size-4" />
+                            <span className="sr-only">Contact actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => openEdit(contact)}>
+                            <PencilIcon className="size-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={() => setDeleteTarget(contact)}
+                          >
+                            <Trash2Icon className="size-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </CardContent>
                   </Card>
                 </motion.div>
