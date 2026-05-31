@@ -36,6 +36,14 @@ test("contact and money movement mutations invalidate related cache entries", ()
 test("profile budget reads gracefully handle databases without budget columns", () => {
   assert.match(source, /function isMissingProfileBudgetColumns/)
   assert.match(source, /isMissingProfileBudgetColumns\(error\)/)
-  assert.match(source, /\.select\("\*"\)/)
+  assert.match(source, /\.select\("monthly_budget, category_budgets"\)/)
   assert.match(source, /console\.warn\("Profile budget columns are unavailable/)
+})
+
+test("monthly budget updates read back the persisted profile row", () => {
+  assert.match(source, /export async function updateMonthlyBudget/)
+  assert.match(source, /\.update\(\{ monthly_budget: amount \}\)/)
+  assert.match(source, /\.select\("monthly_budget, category_budgets"\)/)
+  assert.match(source, /\.single\(\)/)
+  assert.match(source, /Promise<ProfileBudgets \| null>/)
 })

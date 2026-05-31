@@ -22,6 +22,11 @@ import { ShieldCheckIcon, Edit2Icon, Loader2Icon, CheckCircle2Icon } from "lucid
 import { useCachedQuery } from "@/hooks/use-cached-query"
 import { CACHE_KEYS } from "@/lib/offline-cache"
 import { DEMO_USER_ID, getProfileBudgets, getTransactions, updateMonthlyBudget } from "@/lib/supabase"
+import {
+  buildSpendingLimitSummary,
+  normalizeMonthlyBudget,
+  parseMonthlyBudgetInput,
+} from "@/lib/spending-limit-utils"
 import { motion } from "motion/react"
 
 export function SpendingLimit() {
@@ -41,37 +46,22 @@ export function SpendingLimit() {
     fetcher: getTransactions,
     initialData: [],
   })
-  const budget = profileBudgets.monthly_budget
   const isLoading = budgetLoading || transactionsLoading
   
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [newBudgetVal, setNewBudgetVal] = useState("")
+  const [optimisticBudget, setOptimisticBudget] = useState<number | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState("")
 
-  const spent = useMemo(() => {
-    const now = new Date()
-    const currentYear = now.getFullYear()
-    const currentMonth = now.getMonth() // 0-indexed
-
-    const currentMonthExpenses = transactions.filter((t) => {
-      const txDate = new Date(t.occurred_at)
-      return (
-        t.direction === "out" &&
-        t.type !== "transfer" && // Transfers are not expenses
-        t.type !== "goal_contribution" && // Goal contributions are savings, not spending
-        txDate.getFullYear() === currentYear &&
-        txDate.getMonth() === currentMonth
-      )
-    })
-
-    const sum = currentMonthExpenses.reduce((acc, t) => acc + t.amount, 0)
-    return Math.round(sum * 100) / 100
-  }, [transactions])
-
-  const percentUsed = Math.min(Math.round((spent / budget) * 100) || 0, 100)
-  const remaining = Math.max(budget - spent, 0)
+  const budget = optimisticBudget ?? normalizeMonthlyBudget(profileBudgets.monthly_budget)
+  const spendingSummary = useMemo(
+    () => buildSpendingLimitSummary({ budget, transactions }),
+    [budget, transactions]
+  )
+  const parsedBudget = parseMonthlyBudgetInput(newBudgetVal)
 
   // Formatter for current month label
   const getPeriodString = () => {
@@ -87,22 +77,29 @@ export function SpendingLimit() {
   const handleOpenEdit = () => {
     setNewBudgetVal(String(budget))
     setSaveSuccess(false)
+    setSaveError("")
     setIsDialogOpen(true)
   }
 
   // Handle save monthly budget
   const handleSaveBudget = async () => {
-    const amt = parseFloat(newBudgetVal)
-    if (isNaN(amt) || amt <= 0) return
+    if (!parsedBudget) {
+      setSaveError("Enter a spending limit greater than 0.")
+      return
+    }
+
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
-      alert("You are offline. Reconnect to update your spending limit.")
+      setSaveError("You are offline. Reconnect to update your spending limit.")
       return
     }
 
     setIsSaving(true)
-    const success = await updateMonthlyBudget(amt)
+    setSaveError("")
+    const updatedBudget = await updateMonthlyBudget(parsedBudget)
 
-    if (success) {
+    if (updatedBudget) {
+      setOptimisticBudget(updatedBudget.monthly_budget)
+      setNewBudgetVal(String(updatedBudget.monthly_budget))
       await refreshBudget()
       setIsSaving(false)
       setSaveSuccess(true)
@@ -112,6 +109,7 @@ export function SpendingLimit() {
       }, 1200)
     } else {
       setIsSaving(false)
+      setSaveError("Could not save the spending limit. Please try again.")
     }
   }
 
@@ -141,7 +139,7 @@ export function SpendingLimit() {
                 <Skeleton className="h-8 w-28 bg-foreground/10 rounded" />
               ) : (
                 <span className="text-2xl font-black tabular-nums tracking-tight">
-                  ৳{budget.toLocaleString()}{" "}
+                  ৳{spendingSummary.budget.toLocaleString()}{" "}
                   <span className="text-xs font-semibold text-muted-foreground">
                     BDT
                   </span>
@@ -153,7 +151,7 @@ export function SpendingLimit() {
           {isLoading ? (
             <Skeleton className="h-2 w-full bg-foreground/5" />
           ) : (
-            <Progress value={percentUsed} className="h-2" />
+            <Progress value={spendingSummary.percentUsed} className="h-2" />
           )}
 
           <div className="flex items-center justify-between text-sm">
@@ -163,7 +161,7 @@ export function SpendingLimit() {
                 <Skeleton className="h-4 w-16 bg-foreground/5 mt-0.5" />
               ) : (
                 <p className="font-bold tabular-nums">
-                  ৳{spent.toLocaleString()}
+                  ৳{spendingSummary.spent.toLocaleString()}
                 </p>
               )}
             </div>
@@ -173,7 +171,7 @@ export function SpendingLimit() {
                 <Skeleton className="h-4 w-16 bg-foreground/5 mt-0.5 ml-auto" />
               ) : (
                 <p className="font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
-                  ৳{remaining.toLocaleString()}
+                  ৳{spendingSummary.remaining.toLocaleString()}
                 </p>
               )}
             </div>
@@ -217,9 +215,18 @@ export function SpendingLimit() {
                       step="500"
                       className="pl-7 font-mono font-bold tracking-wide bg-background/50 border-white/5"
                       value={newBudgetVal}
-                      onChange={(e) => setNewBudgetVal(e.target.value)}
+                      aria-invalid={Boolean(saveError)}
+                      onChange={(e) => {
+                        setNewBudgetVal(e.target.value)
+                        setSaveError("")
+                      }}
                     />
                   </div>
+                  {saveError ? (
+                    <p className="text-xs font-medium text-destructive">
+                      {saveError}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -234,7 +241,7 @@ export function SpendingLimit() {
                   <Button
                     className="flex-1 text-xs h-9 bg-primary text-primary-foreground font-semibold"
                     onClick={handleSaveBudget}
-                    disabled={isSaving || !newBudgetVal}
+                    disabled={isSaving || !parsedBudget}
                   >
                     {isSaving ? (
                       <>

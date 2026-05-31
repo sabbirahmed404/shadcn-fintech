@@ -1,20 +1,16 @@
 "use client"
 
-import Image from "next/image"
 import { AnimatePresence, motion } from "motion/react"
 import { EmptyState } from "@/components/empty-state"
 import {
-  CreditCardIcon,
   FileTextIcon,
   InfoIcon,
-  MoreHorizontalIcon,
   StickyNoteIcon,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { DbTransaction } from "@/lib/supabase"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -28,6 +24,7 @@ interface TransactionTableProps {
   transactions: DbTransaction[]
   selectedIds: Set<string>
   setSelectedIds: (ids: Set<string>) => void
+  isSelecting: boolean
   expandedId: string | null
   setExpandedId: (id: string | null) => void
 }
@@ -43,6 +40,7 @@ export function TransactionTable({
   transactions,
   selectedIds,
   setSelectedIds,
+  isSelecting,
   expandedId,
   setExpandedId,
 }: TransactionTableProps) {
@@ -72,11 +70,15 @@ export function TransactionTable({
 
   return (
     <div className="overflow-hidden rounded-xl ring-1 ring-foreground/10">
-      <div className="overflow-x-auto">
-      <Table>
+      <Table className="table-fixed sm:table-auto">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-10 pl-3">
+            <TableHead
+              className={cn(
+                "w-9 pl-3 sm:w-10",
+                isSelecting ? "table-cell" : "hidden sm:table-cell"
+              )}
+            >
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -87,18 +89,20 @@ export function TransactionTable({
                 className="size-4 cursor-pointer rounded accent-primary"
               />
             </TableHead>
-            <TableHead>Description / Merchant</TableHead>
+            <TableHead className="min-w-0">
+              <span className="hidden sm:inline">Description / Merchant</span>
+              <span className="sm:hidden">Transaction</span>
+            </TableHead>
             <TableHead className="hidden sm:table-cell">Account</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="w-[7.25rem] text-right sm:w-auto">Amount</TableHead>
             <TableHead className="hidden md:table-cell">Date</TableHead>
-            <TableHead className="w-10" />
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {transactions.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7}>
+              <TableCell colSpan={5}>
                 <EmptyState variant="filter" className="py-12" />
               </TableCell>
             </TableRow>
@@ -112,6 +116,7 @@ export function TransactionTable({
                 tx={tx}
                 isSelected={selectedIds.has(tx.id)}
                 isExpanded={isExpanded}
+                isSelecting={isSelecting}
                 onToggleSelect={() => toggleOne(tx.id)}
                 onToggleExpand={() =>
                   setExpandedId(isExpanded ? null : tx.id)
@@ -121,7 +126,6 @@ export function TransactionTable({
           })}
         </TableBody>
       </Table>
-      </div>
     </div>
   )
 }
@@ -130,12 +134,14 @@ function TransactionRow({
   tx,
   isSelected,
   isExpanded,
+  isSelecting,
   onToggleSelect,
   onToggleExpand,
 }: {
   tx: DbTransaction
   isSelected: boolean
   isExpanded: boolean
+  isSelecting: boolean
   onToggleSelect: () => void
   onToggleExpand: () => void
 }) {
@@ -150,7 +156,12 @@ function TransactionRow({
         )}
         onClick={onToggleExpand}
       >
-        <TableCell className="pl-3">
+        <TableCell
+          className={cn(
+            "pl-3",
+            isSelecting ? "table-cell" : "hidden sm:table-cell"
+          )}
+        >
           <input
             type="checkbox"
             checked={isSelected}
@@ -160,20 +171,25 @@ function TransactionRow({
           />
         </TableCell>
 
-        <TableCell>
+        <TableCell className="min-w-0 max-w-0">
           <div className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               {metadata?.icon ? (
                 <span className="text-sm font-semibold">{String(metadata.icon)[0].toUpperCase()}</span>
               ) : (
-                <FileTextIcon className="size-4" />
+                <FileTextIcon />
               )}
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{tx.description || "Manual Transaction"}</p>
-              <Badge variant="secondary" className="mt-0.5 text-[10px]">
-                {tx.category}
-              </Badge>
+              <div className="mt-0.5 flex min-w-0 items-center gap-1.5">
+                <Badge variant="secondary" className="max-w-full truncate text-[10px]">
+                  {tx.category}
+                </Badge>
+                <span className="truncate text-xs text-muted-foreground sm:hidden">
+                  {new Date(tx.occurred_at).toLocaleDateString()}
+                </span>
+              </div>
             </div>
           </div>
         </TableCell>
@@ -184,7 +200,7 @@ function TransactionRow({
           </Badge>
         </TableCell>
 
-        <TableCell className="text-right">
+        <TableCell className="w-[7.25rem] text-right sm:w-auto">
           <span
             className={cn(
               "tabular-nums text-sm font-semibold",
@@ -200,25 +216,13 @@ function TransactionRow({
           <span className="text-sm text-muted-foreground">{new Date(tx.occurred_at).toLocaleDateString()}</span>
         </TableCell>
 
-        <TableCell>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-0 transition-opacity group-hover:opacity-100"
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-          >
-            <MoreHorizontalIcon className="size-4" />
-          </Button>
-        </TableCell>
       </TableRow>
 
       {/* Expanded detail row */}
       <AnimatePresence initial={false}>
         {isExpanded && (
           <tr>
-            <td colSpan={7} className="p-0">
+            <td colSpan={5} className="p-0">
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
@@ -226,23 +230,23 @@ function TransactionRow({
                 transition={{ duration: 0.2, ease: "easeInOut" }}
                 className="overflow-hidden"
               >
-                <div className="flex flex-wrap gap-4 border-b bg-muted/30 px-4 py-3 pl-12 text-sm">
+                <div
+                  className={cn(
+                    "flex flex-wrap gap-4 border-b bg-muted/30 px-4 py-3 text-sm",
+                    isSelecting ? "pl-12" : "sm:pl-12"
+                  )}
+                >
                   <div className="flex items-start gap-2 text-muted-foreground">
-                    <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
+                    <InfoIcon className="mt-0.5 shrink-0" />
                     <span>Type: {tx.type}</span>
                   </div>
 
                   {metadata?.contact != null && (
                     <div className="flex items-start gap-2 text-muted-foreground">
-                      <StickyNoteIcon className="mt-0.5 size-3.5 shrink-0" />
+                      <StickyNoteIcon className="mt-0.5 shrink-0" />
                       <span>Contact: {String(metadata.contact)}</span>
                     </div>
                   )}
-
-                  <Button variant="ghost" size="xs" className="ml-auto">
-                    <FileTextIcon className="size-3.5" />
-                    View Details
-                  </Button>
                 </div>
               </motion.div>
             </td>

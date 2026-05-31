@@ -17,6 +17,7 @@ export function TransactionsPageClient() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isSelecting, setIsSelecting] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const { data, isLoading, refresh } = useCachedQuery({
@@ -111,12 +112,15 @@ export function TransactionsPageClient() {
         typeFilter={typeFilter}
         setTypeFilter={setTypeFilter}
         categories={categories}
+        isSelecting={isSelecting}
+        setIsSelecting={setIsSelecting}
       />
 
       <TransactionTable
         transactions={filteredData}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        isSelecting={isSelecting}
         expandedId={expandedId}
         setExpandedId={setExpandedId}
       />

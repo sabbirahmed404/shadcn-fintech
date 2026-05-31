@@ -26,6 +26,8 @@ interface TransactionFiltersProps {
   typeFilter: string
   setTypeFilter: (v: string) => void
   categories: string[]
+  isSelecting: boolean
+  setIsSelecting: (v: boolean) => void
 }
 
 export function TransactionFilters({
@@ -38,6 +40,8 @@ export function TransactionFilters({
   typeFilter,
   setTypeFilter,
   categories,
+  isSelecting,
+  setIsSelecting,
 }: TransactionFiltersProps) {
   const typeOptions = ["all", "income", "expense"] as const
   const [modalOpen, setModalOpen] = useState(false)
@@ -104,22 +108,33 @@ export function TransactionFilters({
         </SelectContent>
       </Select>
 
-      {/* Type Toggle */}
-      <div className="flex items-center rounded-lg border border-border p-0.5">
-        {typeOptions.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => setTypeFilter(opt)}
-            className={cn(
-              "rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors",
-              typeFilter === opt
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {opt}
-          </button>
-        ))}
+      <div className="flex w-full items-center gap-2 sm:w-auto">
+        {/* Type Toggle */}
+        <div className="flex flex-1 items-center rounded-lg border border-border p-0.5 sm:flex-none">
+          {typeOptions.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => setTypeFilter(opt)}
+              className={cn(
+                "flex-1 rounded-md px-3 py-1 text-sm font-medium capitalize transition-colors sm:flex-none",
+                typeFilter === opt
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="sm:hidden"
+          onClick={() => setIsSelecting(!isSelecting)}
+        >
+          {isSelecting ? "Done" : "Select"}
+        </Button>
       </div>
     </div>
   )

@@ -5,14 +5,11 @@ import {
   CreditCardIcon,
   PlusIcon,
   TrendingUpIcon,
-  EuroIcon,
-  BitcoinIcon,
   ChartLineIcon,
   NfcIcon,
   XIcon,
   CheckCircle2Icon,
   LoaderCircleIcon,
-  BanknoteIcon,
   CoinsIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -229,8 +226,10 @@ export function AccountCards() {
                     if (!c) return null
                     const cardIndex = cardAccounts.findIndex((account) => account.id === accountId)
                     
-                    const isFront = stackPos === order.length - 1
-                    const maxOffset = 36 / Math.max(order.length - 1, 1)
+                    const stackDepth = cardOrder.length
+                    const stackRange = Math.max(stackDepth - 1, 1)
+                    const isFront = stackPos === stackDepth - 1
+                    const maxOffset = 36 / stackRange
                     
                     // Style config
                     const { style, icon, chipColor } = getCardStyle(c.provider, c.type, cardIndex)
@@ -242,7 +241,7 @@ export function AccountCards() {
                         layout
                         animate={{
                           y: stackPos * Math.min(maxOffset, 12),
-                          scale: 1 - (order.length - 1 - stackPos) * (0.08 / Math.max(order.length - 1, 1)),
+                          scale: 1 - (stackDepth - 1 - stackPos) * (0.08 / stackRange),
                           zIndex: stackPos,
                         }}
                         transition={{ type: "spring", stiffness: 350, damping: 25 }}

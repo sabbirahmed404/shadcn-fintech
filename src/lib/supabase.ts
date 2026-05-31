@@ -58,6 +58,7 @@ function invalidateTransactionCaches() {
 function invalidateBudgetCaches() {
   invalidateOfflineCache(DEMO_USER_ID, [
     CACHE_KEYS.profileBudgets,
+    CACHE_KEYS.savingsGoals,
     CACHE_KEYS.financialHealth,
   ])
 }
@@ -344,7 +345,7 @@ export async function getProfileBudgets(): Promise<ProfileBudgets> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select("monthly_budget, category_budgets")
     .eq("id", DEMO_USER_ID)
     .single()
 
@@ -371,21 +372,34 @@ export async function getProfileBudgets(): Promise<ProfileBudgets> {
 /**
  * Updates the user's global monthly spending limit (budget) in their profile.
  */
-export async function updateMonthlyBudget(amount: number): Promise<boolean> {
+export async function updateMonthlyBudget(
+  amount: number
+): Promise<ProfileBudgets | null> {
   await ensureAuthenticated()
 
-  const { error } = await supabase
+  if (!Number.isFinite(amount) || amount <= 0) {
+    console.error("Error updating monthly budget: amount must be greater than 0")
+    return null
+  }
+
+  const { data, error } = await supabase
     .from("profiles")
     .update({ monthly_budget: amount })
     .eq("id", DEMO_USER_ID)
+    .select("monthly_budget, category_budgets")
+    .single()
 
   if (error) {
     console.error("Error updating monthly budget:", error.message)
-    return false
+    return null
   }
 
   invalidateBudgetCaches()
-  return true
+  return {
+    monthly_budget: Number(data.monthly_budget) || amount,
+    category_budgets:
+      (data.category_budgets as ProfileBudgets["category_budgets"]) || {},
+  }
 }
 
 /**
@@ -587,12 +601,53 @@ export async function deleteTransactions(transactionIds: string[]): Promise<bool
 export type DbSavingsGoal = {
   id: string
   name: string
+  target_type: "emergency" | "savings" | "dream" | "vacation" | "business" | "custom"
   target_amount: number
   current_amount: number
   target_date: string | null
   monthly_contribution: number
   icon: string
   is_active: boolean
+}
+
+export type DbSavingsGoalContribution = {
+  id: string
+  target_id: string
+  amount: number
+  contributed_at: string
+  notes: string | null
+  created_at: string
+}
+
+export type SavingsGoalInput = {
+  name: string
+  targetAmount: number
+  currentAmount: number
+  targetDate: string | null
+  monthlyContribution: number
+  icon: string
+  targetType?: DbSavingsGoal["target_type"]
+}
+
+type SavingsGoalRow = {
+  id: string
+  name: string
+  target_type: DbSavingsGoal["target_type"]
+  target_amount: number | string
+  current_amount: number | string
+  target_date: string | null
+  monthly_contribution: number | string
+  icon: string | null
+  is_active: boolean
+}
+
+type SavingsGoalContributionRow = {
+  id: string
+  target_id: string
+  amount: number | string
+  contributed_at: string
+  notes: string | null
+  created_at: string
 }
 
 /**
@@ -606,6 +661,8 @@ export async function getSavingsGoals(): Promise<DbSavingsGoal[]> {
     .select("*")
     .eq("user_id", DEMO_USER_ID)
     .eq("is_active", true)
+    .order("priority", { ascending: true })
+    .order("created_at", { ascending: true })
 
   if (error) {
     console.error("Error fetching savings goals:", error.message)
@@ -615,6 +672,7 @@ export async function getSavingsGoals(): Promise<DbSavingsGoal[]> {
   return data.map((g) => ({
     id: g.id,
     name: g.name,
+    target_type: g.target_type,
     target_amount: Number(g.target_amount),
     current_amount: Number(g.current_amount),
     target_date: g.target_date,
@@ -622,6 +680,203 @@ export async function getSavingsGoals(): Promise<DbSavingsGoal[]> {
     icon: g.icon || "shield",
     is_active: g.is_active,
   }))
+}
+
+function mapSavingsGoal(g: SavingsGoalRow): DbSavingsGoal {
+  return {
+    id: g.id,
+    name: g.name,
+    target_type: g.target_type,
+    target_amount: Number(g.target_amount),
+    current_amount: Number(g.current_amount),
+    target_date: g.target_date,
+    monthly_contribution: Number(g.monthly_contribution),
+    icon: g.icon || "piggy-bank",
+    is_active: g.is_active,
+  }
+}
+
+function mapContribution(row: SavingsGoalContributionRow): DbSavingsGoalContribution {
+  return {
+    id: row.id,
+    target_id: row.target_id,
+    amount: Number(row.amount),
+    contributed_at: row.contributed_at,
+    notes: row.notes,
+    created_at: row.created_at,
+  }
+}
+
+export async function createSavingsGoal(input: SavingsGoalInput): Promise<DbSavingsGoal | null> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase
+    .from("fund_targets")
+    .insert({
+      user_id: DEMO_USER_ID,
+      name: input.name,
+      target_type: input.targetType || "custom",
+      target_amount: input.targetAmount,
+      current_amount: input.currentAmount,
+      target_date: input.targetDate,
+      monthly_contribution: input.monthlyContribution,
+      icon: input.icon,
+      is_active: true,
+    })
+    .select("*")
+    .single()
+
+  if (error) {
+    console.error("Error creating savings goal:", error.message)
+    return null
+  }
+
+  invalidateBudgetCaches()
+  return mapSavingsGoal(data)
+}
+
+export async function updateSavingsGoal(
+  goalId: string,
+  input: SavingsGoalInput
+): Promise<DbSavingsGoal | null> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase
+    .from("fund_targets")
+    .update({
+      name: input.name,
+      target_type: input.targetType || "custom",
+      target_amount: input.targetAmount,
+      current_amount: input.currentAmount,
+      target_date: input.targetDate,
+      monthly_contribution: input.monthlyContribution,
+      icon: input.icon,
+    })
+    .eq("id", goalId)
+    .eq("user_id", DEMO_USER_ID)
+    .select("*")
+    .single()
+
+  if (error) {
+    console.error("Error updating savings goal:", error.message)
+    return null
+  }
+
+  invalidateBudgetCaches()
+  return mapSavingsGoal(data)
+}
+
+export async function deleteSavingsGoal(goalId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase
+    .from("fund_targets")
+    .update({ is_active: false })
+    .eq("id", goalId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error deleting savings goal:", error.message)
+    return false
+  }
+
+  invalidateBudgetCaches()
+  return true
+}
+
+export async function getSavingsGoalContributions(
+  goalId: string
+): Promise<DbSavingsGoalContribution[]> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase
+    .from("fund_target_contributions")
+    .select("id, target_id, amount, contributed_at, notes, created_at")
+    .eq("user_id", DEMO_USER_ID)
+    .eq("target_id", goalId)
+    .order("contributed_at", { ascending: false })
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error fetching savings goal contributions:", error.message)
+    return []
+  }
+
+  return data.map(mapContribution)
+}
+
+export async function addSavingsGoalContribution({
+  goalId,
+  amount,
+  contributedAt,
+  notes,
+}: {
+  goalId: string
+  amount: number
+  contributedAt: string
+  notes?: string | null
+}): Promise<DbSavingsGoalContribution | null> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase.rpc("fn_add_fund_target_contribution", {
+    p_target_id: goalId,
+    p_amount: amount,
+    p_contributed_at: contributedAt,
+    p_notes: notes || null,
+  })
+
+  if (error) {
+    console.error("Error adding savings goal contribution:", error.message)
+    return null
+  }
+
+  invalidateBudgetCaches()
+  return mapContribution(data)
+}
+
+export async function updateSavingsGoalContribution({
+  contributionId,
+  amount,
+  contributedAt,
+  notes,
+}: {
+  contributionId: string
+  amount: number
+  contributedAt: string
+  notes?: string | null
+}): Promise<DbSavingsGoalContribution | null> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase.rpc("fn_update_fund_target_contribution", {
+    p_contribution_id: contributionId,
+    p_amount: amount,
+    p_contributed_at: contributedAt,
+    p_notes: notes || null,
+  })
+
+  if (error) {
+    console.error("Error updating savings goal contribution:", error.message)
+    return null
+  }
+
+  invalidateBudgetCaches()
+  return mapContribution(data)
+}
+
+export async function deleteSavingsGoalContribution(contributionId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase.rpc("fn_delete_fund_target_contribution", {
+    p_contribution_id: contributionId,
+  })
+
+  if (error) {
+    console.error("Error deleting savings goal contribution:", error.message)
+    return false
+  }
+
+  invalidateBudgetCaches()
+  return true
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
