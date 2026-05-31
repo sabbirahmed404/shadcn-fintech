@@ -295,11 +295,11 @@ export function ContactsPageClient() {
                         )}
                       </div>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-7 shrink-0">
-                            <MoreVerticalIcon className="size-4" />
-                            <span className="sr-only">Contact actions</span>
-                          </Button>
+                        <DropdownMenuTrigger
+                          render={<Button variant="ghost" size="icon" className="size-7 shrink-0" />}
+                        >
+                          <MoreVerticalIcon className="size-4" />
+                          <span className="sr-only">Contact actions</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onSelect={() => openEdit(contact)}>
