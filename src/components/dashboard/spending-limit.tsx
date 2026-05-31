@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 import {
   Card,
   CardContent,
@@ -19,13 +19,30 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ShieldCheckIcon, Edit2Icon, Loader2Icon, CheckCircle2Icon } from "lucide-react"
-import { getProfileBudgets, getTransactions, updateMonthlyBudget } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getProfileBudgets, getTransactions, updateMonthlyBudget } from "@/lib/supabase"
 import { motion } from "motion/react"
 
 export function SpendingLimit() {
-  const [budget, setBudget] = useState(30000)
-  const [spent, setSpent] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const {
+    data: profileBudgets,
+    isLoading: budgetLoading,
+    refresh: refreshBudget,
+  } = useCachedQuery({
+    key: CACHE_KEYS.profileBudgets,
+    userId: DEMO_USER_ID,
+    fetcher: getProfileBudgets,
+    initialData: { monthly_budget: 30000, category_budgets: {} },
+  })
+  const { data: transactions, isLoading: transactionsLoading } = useCachedQuery({
+    key: CACHE_KEYS.transactions,
+    userId: DEMO_USER_ID,
+    fetcher: getTransactions,
+    initialData: [],
+  })
+  const budget = profileBudgets.monthly_budget
+  const isLoading = budgetLoading || transactionsLoading
   
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -33,22 +50,12 @@ export function SpendingLimit() {
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  const fetchData = async () => {
-    setIsLoading(true)
-    
-    // Fetch budget settings from profile
-    const budgetSettings = await getProfileBudgets()
-    setBudget(budgetSettings.monthly_budget)
-    
-    // Fetch transactions
-    const txData = await getTransactions()
-    
-    // Compute spending for the current calendar month
+  const spent = useMemo(() => {
     const now = new Date()
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() // 0-indexed
 
-    const currentMonthExpenses = txData.filter((t) => {
+    const currentMonthExpenses = transactions.filter((t) => {
       const txDate = new Date(t.occurred_at)
       return (
         t.direction === "out" &&
@@ -60,14 +67,8 @@ export function SpendingLimit() {
     })
 
     const sum = currentMonthExpenses.reduce((acc, t) => acc + t.amount, 0)
-    setSpent(Math.round(sum * 100) / 100)
-    
-    setIsLoading(false)
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
+    return Math.round(sum * 100) / 100
+  }, [transactions])
 
   const percentUsed = Math.min(Math.round((spent / budget) * 100) || 0, 100)
   const remaining = Math.max(budget - spent, 0)
@@ -93,18 +94,24 @@ export function SpendingLimit() {
   const handleSaveBudget = async () => {
     const amt = parseFloat(newBudgetVal)
     if (isNaN(amt) || amt <= 0) return
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      alert("You are offline. Reconnect to update your spending limit.")
+      return
+    }
 
     setIsSaving(true)
     const success = await updateMonthlyBudget(amt)
-    setIsSaving(false)
 
     if (success) {
-      setBudget(amt)
+      await refreshBudget()
+      setIsSaving(false)
       setSaveSuccess(true)
       setTimeout(() => {
         setIsDialogOpen(false)
         setSaveSuccess(false)
       }, 1200)
+    } else {
+      setIsSaving(false)
     }
   }
 

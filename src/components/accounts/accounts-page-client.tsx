@@ -8,7 +8,9 @@ import { AccountSummary } from "@/components/accounts/account-summary"
 import { AccountCard } from "@/components/accounts/account-grid"
 import { AddAccount } from "@/components/accounts/add-account"
 import { EmptyState } from "@/components/empty-state"
-import { getAccounts } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getAccounts } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getInstitutionLogo } from "@/lib/utils"
 
@@ -41,18 +43,20 @@ function mapDbAccount(d: Awaited<ReturnType<typeof getAccounts>>[number]): BankA
 export function AccountsPageClient() {
   const [selectedType, setSelectedType] = useState<AccountType>("all")
   const [accounts, setAccounts] = useState<BankAccount[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const {
+    data: dbAccounts,
+    isLoading,
+    refresh,
+  } = useCachedQuery({
+    key: CACHE_KEYS.accounts,
+    userId: DEMO_USER_ID,
+    fetcher: getAccounts,
+    initialData: [],
+  })
 
   useEffect(() => {
-    async function load() {
-      setIsLoading(true)
-      const data = await getAccounts()
-
-      setAccounts(data.map(mapDbAccount))
-      setIsLoading(false)
-    }
-    load()
-  }, [])
+    setAccounts(dbAccounts.map(mapDbAccount))
+  }, [dbAccounts])
 
   const filtered = useMemo(
     () =>
@@ -64,6 +68,7 @@ export function AccountsPageClient() {
 
   function handleAddAccount(account: BankAccount) {
     setAccounts((prev) => [...prev, account])
+    void refresh()
   }
 
   function handleUpdateAccount(updated: BankAccount) {

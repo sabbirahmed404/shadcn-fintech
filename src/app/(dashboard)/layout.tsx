@@ -3,6 +3,7 @@ import { CommandPalette } from "@/components/command-palette"
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
+import { PwaServiceWorker } from "@/components/pwa-service-worker"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -41,6 +42,7 @@ export default function DashboardLayout({
         <main className="flex flex-1 flex-col pb-24 md:pb-0">{children}</main>
         <MobileBottomNav />
         <PwaInstallPrompt />
+        <PwaServiceWorker />
       </SidebarInset>
     </SidebarProvider>
   )

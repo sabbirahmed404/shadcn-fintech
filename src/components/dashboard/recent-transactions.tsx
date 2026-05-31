@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
   Card,
@@ -16,7 +15,9 @@ import {
   FileTextIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getTransactions, type DbTransaction } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getTransactions, type DbTransaction } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const categoryColors: Record<string, string> = {
@@ -43,25 +44,13 @@ const formatDate = (value: string) =>
   }).format(new Date(value))
 
 export function RecentTransactions() {
-  const [transactions, setTransactions] = useState<DbTransaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    let isMounted = true
-
-    async function loadTransactions() {
-      const data = await getTransactions()
-      if (!isMounted) return
-      setTransactions(data.slice(0, 7))
-      setIsLoading(false)
-    }
-
-    loadTransactions()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const { data, isLoading } = useCachedQuery({
+    key: CACHE_KEYS.transactions,
+    userId: DEMO_USER_ID,
+    fetcher: getTransactions,
+    initialData: [],
+  })
+  const transactions = data.slice(0, 7)
 
   return (
     <Card>

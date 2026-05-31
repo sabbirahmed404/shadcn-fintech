@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ChartContainer,
@@ -11,7 +11,9 @@ import {
 import { Area, AreaChart, ReferenceLine, XAxis, YAxis } from "recharts"
 import { AlertTriangleIcon, CheckCircle2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getProfileBudgets, getTransactions, type DbTransaction } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getProfileBudgets, getTransactions } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const chartConfig = {
@@ -22,22 +24,20 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthProjection() {
-  const [transactions, setTransactions] = useState<DbTransaction[]>([])
-  const [totalBudget, setTotalBudget] = useState<number>(0)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const [txs, profile] = await Promise.all([
-        getTransactions(),
-        getProfileBudgets()
-      ])
-      setTransactions(txs)
-      setTotalBudget(profile.monthly_budget)
-      setIsLoading(false)
-    }
-    load()
-  }, [])
+  const { data: transactions, isLoading: transactionsLoading } = useCachedQuery({
+    key: CACHE_KEYS.transactions,
+    userId: DEMO_USER_ID,
+    fetcher: getTransactions,
+    initialData: [],
+  })
+  const { data: profileBudgets, isLoading: profileLoading } = useCachedQuery({
+    key: CACHE_KEYS.profileBudgets,
+    userId: DEMO_USER_ID,
+    fetcher: getProfileBudgets,
+    initialData: { monthly_budget: 0, category_budgets: {} },
+  })
+  const totalBudget = profileBudgets.monthly_budget
+  const isLoading = transactionsLoading || profileLoading
 
   const stats = useMemo(() => {
     const now = new Date()

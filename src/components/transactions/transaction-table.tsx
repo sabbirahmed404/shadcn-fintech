@@ -139,7 +139,7 @@ function TransactionRow({
   onToggleSelect: () => void
   onToggleExpand: () => void
 }) {
-  const metadata = tx.metadata as Record<string, any> | null
+  const metadata = tx.metadata as Record<string, unknown> | null
   return (
     <>
       <TableRow
@@ -232,7 +232,7 @@ function TransactionRow({
                     <span>Type: {tx.type}</span>
                   </div>
 
-                  {metadata?.contact && (
+                  {metadata?.contact != null && (
                     <div className="flex items-start gap-2 text-muted-foreground">
                       <StickyNoteIcon className="mt-0.5 size-3.5 shrink-0" />
                       <span>Contact: {String(metadata.contact)}</span>

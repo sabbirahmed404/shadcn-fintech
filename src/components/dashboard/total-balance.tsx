@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "motion/react"
 import {
   PlusIcon,
@@ -32,7 +32,9 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AddTransactionModal } from "@/components/transactions/add-transaction-modal"
-import { getAccounts, updateAccountBalance, AccountWithBalance } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getAccounts, updateAccountBalance } from "@/lib/supabase"
 
 // Bangladesh English locale formatting helper
 const fmt = (n: number) => {
@@ -45,48 +47,24 @@ const fmt = (n: number) => {
 
 export function TotalBalance() {
   const [isVisible, setIsVisible] = useState(true)
-  const [accounts, setAccounts] = useState<AccountWithBalance[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false)
+  const {
+    data: accounts,
+    isLoading,
+    refresh,
+  } = useCachedQuery({
+    key: CACHE_KEYS.accounts,
+    userId: DEMO_USER_ID,
+    fetcher: getAccounts,
+    initialData: [],
+  })
   
   // Dialog state
   const [selectedAccountId, setSelectedAccountId] = useState<string>("")
   const [newBalanceValue, setNewBalanceValue] = useState<string>("")
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
-
-  // Fetch accounts from Supabase
-  const fetchBalances = async (showLoading = true) => {
-    if (showLoading) {
-      setIsLoading(true)
-    }
-    
-    const data = await getAccounts()
-    setAccounts(data)
-    
-    if (showLoading) {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadBalances = async () => {
-      setIsLoading(true)
-      const data = await getAccounts()
-      if (!isMounted) return
-      setAccounts(data)
-      setIsLoading(false)
-    }
-
-    void loadBalances()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   // Aggregate dynamically
   const bankAccounts = accounts.filter((a) => a.type === "bank")
@@ -159,21 +137,24 @@ export function TotalBalance() {
   const handleSaveBalance = async () => {
     const targetVal = parseFloat(newBalanceValue)
     if (isNaN(targetVal) || !selectedAccountId) return
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      alert("You are offline. Reconnect to adjust balances.")
+      return
+    }
 
     setIsSaving(true)
     const success = await updateAccountBalance(selectedAccountId, targetVal)
-    setIsSaving(false)
 
     if (success) {
+      await refresh()
+      setIsSaving(false)
       setSaveSuccess(true)
-      // Optimistic updates
-      setAccounts((prev) =>
-        prev.map((a) => (a.id === selectedAccountId ? { ...a, balance: targetVal } : a))
-      )
       setTimeout(() => {
         setIsDialogOpen(false)
         setSaveSuccess(false)
       }, 1200)
+    } else {
+      setIsSaving(false)
     }
   }
 
@@ -441,7 +422,7 @@ export function TotalBalance() {
         open={isTransactionDialogOpen}
         onOpenChange={setIsTransactionDialogOpen}
         onSuccess={() => {
-          void fetchBalances(false)
+          void refresh()
         }}
       />
     </>

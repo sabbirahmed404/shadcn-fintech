@@ -1,31 +1,30 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 
 import { TransactionSummary } from "@/components/transactions/transaction-summary"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { TransactionTable } from "@/components/transactions/transaction-table"
 import { TransactionActions } from "@/components/transactions/transaction-actions"
-import { getTransactions, deleteTransactions, type DbTransaction } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { getTransactions, deleteTransactions, DEMO_USER_ID } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function TransactionsPageClient() {
-  const [data, setData] = useState<DbTransaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [expandedId, setExpandedId] = useState<string | null>(null)
-
-  useEffect(() => {
-    getTransactions().then((txs) => {
-      setData(txs)
-      setIsLoading(false)
-    })
-  }, [])
+  const [isDeleting, setIsDeleting] = useState(false)
+  const { data, isLoading, refresh } = useCachedQuery({
+    key: CACHE_KEYS.transactions,
+    userId: DEMO_USER_ID,
+    fetcher: getTransactions,
+    initialData: [],
+  })
 
   const categories = useMemo(() => {
     const cats = new Set(data.map((t) => t.category))
@@ -78,19 +77,23 @@ export function TransactionsPageClient() {
     if (ids.length === 0) return
     if (!confirm(`Are you sure you want to delete ${ids.length} transactions?`)) return
     
-    setIsLoading(true)
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      alert("You are offline. Reconnect to delete transactions.")
+      return
+    }
+
+    setIsDeleting(true)
     const success = await deleteTransactions(ids)
     if (success) {
       setSelectedIds(new Set())
-      const newTxs = await getTransactions()
-      setData(newTxs)
+      await refresh()
     } else {
       alert("Failed to delete transactions")
     }
-    setIsLoading(false)
+    setIsDeleting(false)
   }
 
-  if (isLoading) {
+  if (isLoading || isDeleting) {
     return <TransactionsLoadingSkeleton />
   }
 

@@ -124,9 +124,16 @@
   body {
     @apply bg-background text-foreground;
     padding-top: env(safe-area-inset-top);
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    padding-bottom: env(safe-area-inset-bottom);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   html {
     @apply font-sans;
+    min-height: 100%;
+    overscroll-behavior-y: none;
   }
 }
 

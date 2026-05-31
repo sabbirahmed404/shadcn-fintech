@@ -5,6 +5,7 @@ import {
   updateBudgetCategoryItem,
   type BudgetCategorySettings,
 } from "@/lib/budget-category-config"
+import { CACHE_KEYS, invalidateOfflineCache } from "@/lib/offline-cache"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const supabaseAnonKey =
@@ -35,6 +36,51 @@ export const supabase =
 export const DEMO_USER_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 export const DEMO_USER_EMAIL = "sabbir@wealthos.local"
 export const DEMO_USER_PASSWORD = "password123"
+
+function invalidateAccountCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.accounts,
+    CACHE_KEYS.monthlyOverview,
+    CACHE_KEYS.financialHealth,
+  ])
+}
+
+function invalidateTransactionCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.transactions,
+    CACHE_KEYS.accounts,
+    CACHE_KEYS.monthlyOverview,
+    CACHE_KEYS.moneyMovement("*"),
+    CACHE_KEYS.financialHealth,
+  ])
+}
+
+function invalidateBudgetCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.profileBudgets,
+    CACHE_KEYS.financialHealth,
+  ])
+}
+
+function invalidateContactCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.contacts,
+    CACHE_KEYS.debts,
+    CACHE_KEYS.transfers,
+    CACHE_KEYS.transactions,
+  ])
+}
+
+function invalidateMoneyMovementCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.debts,
+    CACHE_KEYS.transfers,
+    CACHE_KEYS.transactions,
+    CACHE_KEYS.accounts,
+    CACHE_KEYS.moneyMovement("*"),
+    CACHE_KEYS.financialHealth,
+  ])
+}
 
 /**
  * Singleton guard — prevents concurrent ensureAuthenticated() calls from
@@ -192,6 +238,7 @@ export async function updateAccountBalance(accountId: string, targetBalance: num
     return false
   }
 
+  invalidateAccountCaches()
   return true
 }
 
@@ -224,6 +271,7 @@ export async function updateAccountDetails(
     return false
   }
 
+  invalidateAccountCaches()
   return true
 }
 
@@ -260,6 +308,7 @@ export async function addAccount(
     return null
   }
 
+  invalidateAccountCaches()
   return {
     ...data,
     opening_balance: Number(data.opening_balance),
@@ -272,6 +321,21 @@ export type ProfileBudgets = {
   category_budgets: Record<string, number> | BudgetCategorySettings
 }
 
+const DEFAULT_PROFILE_BUDGETS: ProfileBudgets = {
+  monthly_budget: 30000,
+  category_budgets: {},
+}
+
+function isMissingProfileBudgetColumns(error: { message?: string } | null) {
+  const message = error?.message ?? ""
+  return (
+    message.includes("profiles.monthly_budget") ||
+    message.includes("profiles.category_budgets") ||
+    message.includes("monthly_budget") ||
+    message.includes("category_budgets")
+  )
+}
+
 /**
  * Fetches the global monthly spending limit and custom category budgets from the database profile.
  */
@@ -280,21 +344,27 @@ export async function getProfileBudgets(): Promise<ProfileBudgets> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("monthly_budget, category_budgets")
+    .select("*")
     .eq("id", DEMO_USER_ID)
     .single()
 
   if (error) {
-    console.error("Error fetching profile budgets:", error.message)
-    return {
-      monthly_budget: 30000,
-      category_budgets: {}
+    if (isMissingProfileBudgetColumns(error)) {
+      console.warn("Profile budget columns are unavailable; using default budgets.")
+      return DEFAULT_PROFILE_BUDGETS
     }
+
+    console.error("Error fetching profile budgets:", error.message)
+    return DEFAULT_PROFILE_BUDGETS
   }
 
   return {
-    monthly_budget: Number(data.monthly_budget) || 30000,
-    category_budgets: (data.category_budgets as ProfileBudgets["category_budgets"]) || {},
+    monthly_budget:
+      "monthly_budget" in data ? Number(data.monthly_budget) || 30000 : 30000,
+    category_budgets:
+      "category_budgets" in data
+        ? (data.category_budgets as ProfileBudgets["category_budgets"]) || {}
+        : {},
   }
 }
 
@@ -314,6 +384,7 @@ export async function updateMonthlyBudget(amount: number): Promise<boolean> {
     return false
   }
 
+  invalidateBudgetCaches()
   return true
 }
 
@@ -349,6 +420,7 @@ export async function updateCategoryBudgetSettings(
     return false
   }
 
+  invalidateBudgetCaches()
   return true
 }
 
@@ -491,6 +563,7 @@ export async function addTransaction(data: {
     console.error("Error adding transaction:", error.message)
     return false
   }
+  invalidateTransactionCaches()
   return true
 }
 
@@ -507,6 +580,7 @@ export async function deleteTransactions(transactionIds: string[]): Promise<bool
     console.error("Error deleting transactions:", error.message)
     return false
   }
+  invalidateTransactionCaches()
   return true
 }
 
@@ -607,6 +681,7 @@ export async function addContact(input: ContactInput): Promise<DbContact | null>
     console.error("Error adding contact:", error.message)
     return null
   }
+  invalidateContactCaches()
   return data as DbContact
 }
 
@@ -629,6 +704,7 @@ export async function updateContact(id: string, input: ContactInput): Promise<bo
     console.error("Error updating contact:", error.message)
     return false
   }
+  invalidateContactCaches()
   return true
 }
 
@@ -645,6 +721,7 @@ export async function deleteContact(id: string): Promise<boolean> {
     console.error("Error deleting contact:", error.message)
     return false
   }
+  invalidateContactCaches()
   return true
 }
 
@@ -776,6 +853,7 @@ export async function recordMoneyMovement(input: {
     console.error("Error recording money movement:", txError.message)
     return false
   }
+  invalidateMoneyMovementCaches()
   return true
 }
 
@@ -845,6 +923,7 @@ export async function repayDebt(input: {
     console.error("Error inserting debt settlement:", settleError.message)
     return false
   }
+  invalidateMoneyMovementCaches()
   return true
 }
 

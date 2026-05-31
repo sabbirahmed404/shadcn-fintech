@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
-import { getTransfers, type DbTransfer } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getTransfers } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { TransferStats } from "@/components/transfers/transfer-stats"
 import { TransferList } from "@/components/transfers/transfer-list"
@@ -19,20 +21,16 @@ const tabs: { key: TabKey; label: string }[] = [
 
 export function TransfersPageClient() {
   const [activeTab, setActiveTab] = useState<TabKey>("all")
-  const [transfers, setTransfers] = useState<DbTransfer[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const load = async () => {
-    const data = await getTransfers()
-    setTransfers(data)
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    // load() sets state only after awaiting the fetch (not synchronous)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load()
-  }, [])
+  const {
+    data: transfers,
+    isLoading: loading,
+    refresh,
+  } = useCachedQuery({
+    key: CACHE_KEYS.transfers,
+    userId: DEMO_USER_ID,
+    fetcher: getTransfers,
+    initialData: [],
+  })
 
   const filtered = useMemo(() => {
     switch (activeTab) {
@@ -74,7 +72,7 @@ export function TransfersPageClient() {
       <TransferList transfers={filtered} loading={loading} />
 
       {/* Quick send */}
-      <QuickSend onSent={load} />
+      <QuickSend onSent={refresh} />
     </div>
   )
 }

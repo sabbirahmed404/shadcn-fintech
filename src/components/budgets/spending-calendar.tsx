@@ -1,25 +1,22 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { getTransactions, type DbTransaction } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getTransactions } from "@/lib/supabase"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 export function SpendingCalendar() {
-  const [transactions, setTransactions] = useState<DbTransaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    async function load() {
-      const data = await getTransactions()
-      setTransactions(data)
-      setIsLoading(false)
-    }
-    load()
-  }, [])
+  const { data: transactions, isLoading } = useCachedQuery({
+    key: CACHE_KEYS.transactions,
+    userId: DEMO_USER_ID,
+    fetcher: getTransactions,
+    initialData: [],
+  })
 
   const { weeks, maxAmount, monthName, year } = useMemo(() => {
     // Group transactions by date

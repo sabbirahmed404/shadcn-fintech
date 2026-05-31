@@ -32,6 +32,7 @@ export function PwaInstallPrompt() {
     const ios =
       /iPad|iPhone|iPod/.test(navigator.userAgent) &&
       !("MSStream" in window)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsIOS(ios)
 
     // iOS can't trigger an install programmatically — show instructions instead.

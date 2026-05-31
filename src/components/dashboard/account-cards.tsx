@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import {
   CreditCardIcon,
   PlusIcon,
@@ -27,7 +27,9 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "motion/react"
-import { getAccounts, addAccount, AccountWithBalance } from "@/lib/supabase"
+import { useCachedQuery } from "@/hooks/use-cached-query"
+import { CACHE_KEYS } from "@/lib/offline-cache"
+import { DEMO_USER_ID, getAccounts, addAccount } from "@/lib/supabase"
 import { cn, getInstitutionLogo } from "@/lib/utils"
 
 type AddState = "idle" | "form" | "adding" | "success"
@@ -101,9 +103,17 @@ const newCardOptions = [
 ]
 
 export function AccountCards() {
-  const [accounts, setAccounts] = useState<AccountWithBalance[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [order, setOrder] = useState<number[]>([])
+  const {
+    data: accounts,
+    isLoading,
+    refresh,
+  } = useCachedQuery({
+    key: CACHE_KEYS.accounts,
+    userId: DEMO_USER_ID,
+    fetcher: getAccounts,
+    initialData: [],
+  })
+  const [order, setOrder] = useState<string[]>([])
   
   // Card adding form states
   const [addState, setAddState] = useState<AddState>("idle")
@@ -111,42 +121,48 @@ export function AccountCards() {
   const [newCardName, setNewCardName] = useState("")
   const [newCardInitialBalance, setNewCardInitialBalance] = useState("5000")
 
-  // Fetch accounts from Supabase
-  const loadAccounts = async () => {
-    setIsLoading(true)
-    const data = await getAccounts()
-    setAccounts(data)
-    
-    // Set order for stacking (only bank and mfs accounts in the stack)
-    const cardAccounts = data.filter(a => a.type === "bank" || a.type === "mfs")
-    setOrder(cardAccounts.map((_, i) => i))
-    setIsLoading(false)
-  }
-
-  useEffect(() => {
-    loadAccounts()
-  }, [])
+  const cardAccounts = useMemo(
+    () => accounts.filter(a => a.type === "bank" || a.type === "mfs"),
+    [accounts]
+  )
+  const baseOrder = useMemo(
+    () => cardAccounts.map((account) => account.id),
+    [cardAccounts]
+  )
+  const cardOrder =
+    order.length === baseOrder.length && order.every((id) => baseOrder.includes(id))
+      ? order
+      : baseOrder
 
   // Rotate stack of cards
   const cycle = useCallback(() => {
     setOrder((prev) => {
-      if (prev.length <= 1) return prev
-      const next = [...prev]
+      const current =
+        prev.length === baseOrder.length && prev.every((id) => baseOrder.includes(id))
+          ? prev
+          : baseOrder
+      if (current.length <= 1) return current
+      const next = [...current]
       const front = next.pop()!
       next.unshift(front)
       return next
     })
-  }, [])
+  }, [baseOrder])
 
   // Automatic stack rotation
   useEffect(() => {
-    if (addState !== "idle" || order.length <= 1) return
+    if (addState !== "idle" || cardOrder.length <= 1) return
     const id = setInterval(cycle, 3000)
     return () => clearInterval(id)
-  }, [cycle, addState, order.length])
+  }, [cycle, addState, cardOrder.length])
 
   // Handle adding card to database
   const handleAdd = async () => {
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      setAddState("form")
+      return
+    }
+
     const initialAmt = parseFloat(newCardInitialBalance) || 0
     const option = newCardOptions.find((o) => o.value === newCardType) || newCardOptions[0]
     
@@ -165,15 +181,12 @@ export function AccountCards() {
         setAddState("idle")
         setNewCardName("")
         setNewCardInitialBalance("5000")
-        await loadAccounts()
+        await refresh()
       }, 1500)
     } else {
       setAddState("form")
     }
   }
-
-  // Filter accounts for card display
-  const cardAccounts = accounts.filter(a => a.type === "bank" || a.type === "mfs")
 
   // Wallet balances
   const cashAccounts = accounts.filter(a => a.type === "cash" || a.type === "mfs")
@@ -211,9 +224,10 @@ export function AccountCards() {
                 </div>
               ) : (
                 <div className="relative h-[180px]">
-                  {order.map((cardIndex, stackPos) => {
-                    const c = cardAccounts[cardIndex]
+                  {cardOrder.map((accountId, stackPos) => {
+                    const c = cardAccounts.find((account) => account.id === accountId)
                     if (!c) return null
+                    const cardIndex = cardAccounts.findIndex((account) => account.id === accountId)
                     
                     const isFront = stackPos === order.length - 1
                     const maxOffset = 36 / Math.max(order.length - 1, 1)
