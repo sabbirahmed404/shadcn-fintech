@@ -6,6 +6,7 @@ import {
   ArrowLeftRightIcon,
   BellIcon,
   BitcoinIcon,
+  Building2Icon,
   ChartAreaIcon,
   CreditCardIcon,
   HelpCircleIcon,
@@ -46,6 +47,7 @@ const primaryItems: MobileNavItem[] = [
 
 const moreItems: MobileNavItem[] = [
   { title: "Contacts", href: "/contacts", icon: UsersIcon },
+  { title: "Organization", href: "/organization", icon: Building2Icon },
   { title: "Cards", href: "/cards", icon: CreditCardIcon },
   { title: "Transfers", href: "/transfers", icon: SendIcon },
   { title: "Analytics", href: "/analytics", icon: ChartAreaIcon },

@@ -31,6 +31,7 @@ import {
   BellIcon,
   LogInIcon,
   UserPlusIcon,
+  Building2Icon,
 } from "lucide-react"
 
 const data = {
@@ -48,6 +49,7 @@ const data = {
   navMoney: [
     { title: "Transfers", url: "/transfers", icon: <SendIcon /> },
     { title: "Contacts", url: "/contacts", icon: <UsersIcon /> },
+    { title: "Organization", url: "/organization", icon: <Building2Icon /> },
     { title: "Investments", url: "/investments", icon: <TrendingUpIcon /> },
     { title: "Crypto", url: "/crypto", icon: <BitcoinIcon /> },
   ],

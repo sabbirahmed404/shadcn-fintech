@@ -78,8 +78,8 @@ export function MultiWalletSelector({
             <div key={index} className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <Select
-                  value={allocation.accountId}
-                  onValueChange={(val) => handleUpdate(index, { accountId: val })}
+                  value={allocation.accountId || undefined}
+                  onValueChange={(val) => handleUpdate(index, { accountId: val || "" })}
                 >
                   <SelectTrigger className="flex-1 overflow-hidden">
                     <SelectValue placeholder="Select Account">

@@ -14,6 +14,7 @@ export const CACHE_KEYS = {
   monthlyOverview: "monthly-overview",
   moneyMovement: (period: string) => `money-movement:${period}`,
   financialHealth: "financial-health",
+  projects: "projects",
 } as const
 
 export type CacheEnvelope<T> = {

@@ -6,6 +6,7 @@ import {
   type BudgetCategorySettings,
 } from "@/lib/budget-category-config"
 import { CACHE_KEYS, invalidateOfflineCache } from "@/lib/offline-cache"
+import { computeMyShare, type ProjectStatus } from "@/lib/project-utils"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 const supabaseAnonKey =
@@ -78,6 +79,17 @@ function invalidateMoneyMovementCaches() {
     CACHE_KEYS.transfers,
     CACHE_KEYS.transactions,
     CACHE_KEYS.accounts,
+    CACHE_KEYS.moneyMovement("*"),
+    CACHE_KEYS.financialHealth,
+  ])
+}
+
+function invalidateProjectCaches() {
+  invalidateOfflineCache(DEMO_USER_ID, [
+    CACHE_KEYS.projects,
+    CACHE_KEYS.accounts,
+    CACHE_KEYS.transactions,
+    CACHE_KEYS.monthlyOverview,
     CACHE_KEYS.moneyMovement("*"),
     CACHE_KEYS.financialHealth,
   ])
@@ -1573,4 +1585,574 @@ export async function getFinancialHealth(): Promise<FinancialHealth> {
   }
 
   return { overall, trend, trendDelta, factors }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Projects (organization / company work, payout milestones, team members)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type ProjectPayoutStatus = "pending" | "received"
+
+export type DbProjectMember = {
+  id: string
+  project_id: string
+  contact_id: string | null
+  name: string | null
+  role: string | null
+  dividend_amount: number | null
+  dividend_percent: number | null
+  contact_name: string | null
+  contact_avatar_url: string | null
+}
+
+export type DbProjectPayout = {
+  id: string
+  project_id: string
+  label: string
+  percent: number | null
+  amount: number
+  status: ProjectPayoutStatus
+  due_date: string | null
+  received_at: string | null
+  account_id: string | null
+  transaction_id: string | null
+  sort_order: number
+  notes: string | null
+}
+
+export type DbProject = {
+  id: string
+  name: string
+  client_name: string | null
+  description: string | null
+  status: ProjectStatus
+  start_date: string | null
+  end_date: string | null
+  total_budget: number
+  my_share_percent: number | null
+  my_share_amount: number | null
+  my_total_share: number
+  currency: string
+  icon: string | null
+  color: string | null
+  sort_order: number
+  notes: string | null
+  payouts: DbProjectPayout[]
+  members: DbProjectMember[]
+}
+
+export type ProjectInput = {
+  name: string
+  clientName: string | null
+  description: string | null
+  status: ProjectStatus
+  startDate: string | null
+  endDate: string | null
+  totalBudget: number
+  mySharePercent: number | null
+  myShareAmount: number | null
+  icon: string | null
+}
+
+export type ProjectPayoutInput = {
+  label: string
+  percent: number | null
+  amount: number
+  dueDate: string | null
+  notes: string | null
+  sortOrder?: number
+}
+
+export type ProjectMemberInput = {
+  contactId: string | null
+  name: string | null
+  role: string | null
+  dividendAmount: number | null
+  dividendPercent: number | null
+}
+
+type ProjectMemberRow = {
+  id: string
+  project_id: string
+  contact_id: string | null
+  name: string | null
+  role: string | null
+  dividend_amount: number | string | null
+  dividend_percent: number | string | null
+  contacts: { name: string; avatar_url: string | null } | { name: string; avatar_url: string | null }[] | null
+}
+
+type ProjectPayoutRow = {
+  id: string
+  project_id: string
+  label: string
+  percent: number | string | null
+  amount: number | string
+  status: ProjectPayoutStatus
+  due_date: string | null
+  received_at: string | null
+  account_id: string | null
+  transaction_id: string | null
+  sort_order: number
+  notes: string | null
+}
+
+type ProjectRow = {
+  id: string
+  name: string
+  client_name: string | null
+  description: string | null
+  status: ProjectStatus
+  start_date: string | null
+  end_date: string | null
+  total_budget: number | string
+  my_share_percent: number | string | null
+  my_share_amount: number | string | null
+  currency: string
+  icon: string | null
+  color: string | null
+  sort_order: number
+  notes: string | null
+  project_payouts: ProjectPayoutRow[] | null
+  project_members: ProjectMemberRow[] | null
+}
+
+function mapPayout(row: ProjectPayoutRow): DbProjectPayout {
+  return {
+    id: row.id,
+    project_id: row.project_id,
+    label: row.label,
+    percent: row.percent === null ? null : Number(row.percent),
+    amount: Number(row.amount),
+    status: row.status,
+    due_date: row.due_date,
+    received_at: row.received_at,
+    account_id: row.account_id,
+    transaction_id: row.transaction_id,
+    sort_order: row.sort_order,
+    notes: row.notes,
+  }
+}
+
+function mapMember(row: ProjectMemberRow): DbProjectMember {
+  const contact = firstRelation(row.contacts)
+  return {
+    id: row.id,
+    project_id: row.project_id,
+    contact_id: row.contact_id,
+    name: row.name,
+    role: row.role,
+    dividend_amount: row.dividend_amount === null ? null : Number(row.dividend_amount),
+    dividend_percent: row.dividend_percent === null ? null : Number(row.dividend_percent),
+    contact_name: contact?.name ?? null,
+    contact_avatar_url: contact?.avatar_url ?? null,
+  }
+}
+
+function mapProject(row: ProjectRow): DbProject {
+  const totalBudget = Number(row.total_budget)
+  const sharePercent = row.my_share_percent === null ? null : Number(row.my_share_percent)
+  const shareAmount = row.my_share_amount === null ? null : Number(row.my_share_amount)
+  const payouts = (row.project_payouts ?? [])
+    .map(mapPayout)
+    .sort((a, b) => a.sort_order - b.sort_order)
+  const members = (row.project_members ?? []).map(mapMember)
+
+  return {
+    id: row.id,
+    name: row.name,
+    client_name: row.client_name,
+    description: row.description,
+    status: row.status,
+    start_date: row.start_date,
+    end_date: row.end_date,
+    total_budget: totalBudget,
+    my_share_percent: sharePercent,
+    my_share_amount: shareAmount,
+    my_total_share: computeMyShare(totalBudget, sharePercent, shareAmount),
+    currency: row.currency,
+    icon: row.icon,
+    color: row.color,
+    sort_order: row.sort_order,
+    notes: row.notes,
+    payouts,
+    members,
+  }
+}
+
+export async function getProjects(): Promise<DbProject[]> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select(`
+      *,
+      project_payouts (*),
+      project_members (
+        *,
+        contacts ( name, avatar_url )
+      )
+    `)
+    .eq("user_id", DEMO_USER_ID)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true })
+
+  if (error) {
+    console.error("Error fetching projects:", error.message)
+    return []
+  }
+
+  return (data as ProjectRow[]).map(mapProject)
+}
+
+function projectInputToRow(input: ProjectInput) {
+  return {
+    name: input.name,
+    client_name: input.clientName,
+    description: input.description,
+    status: input.status,
+    start_date: input.startDate,
+    end_date: input.endDate,
+    total_budget: input.totalBudget,
+    my_share_percent: input.mySharePercent,
+    my_share_amount: input.myShareAmount,
+    icon: input.icon,
+  }
+}
+
+export async function createProject(input: ProjectInput): Promise<string | null> {
+  await ensureAuthenticated()
+
+  const { data, error } = await supabase
+    .from("projects")
+    .insert({ user_id: DEMO_USER_ID, sort_order: 10, ...projectInputToRow(input) })
+    .select("id")
+    .single()
+
+  if (error) {
+    console.error("Error creating project:", error.message)
+    return null
+  }
+
+  invalidateProjectCaches()
+  return data.id
+}
+
+export async function updateProject(projectId: string, input: ProjectInput): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase
+    .from("projects")
+    .update(projectInputToRow(input))
+    .eq("id", projectId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error updating project:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function deleteProject(projectId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error deleting project:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function createProjectPayout(
+  projectId: string,
+  input: ProjectPayoutInput
+): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase.from("project_payouts").insert({
+    project_id: projectId,
+    user_id: DEMO_USER_ID,
+    label: input.label,
+    percent: input.percent,
+    amount: input.amount,
+    due_date: input.dueDate,
+    notes: input.notes,
+    sort_order: input.sortOrder ?? 10,
+  })
+
+  if (error) {
+    console.error("Error creating project payout:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function updateProjectPayout(
+  payoutId: string,
+  input: ProjectPayoutInput
+): Promise<boolean> {
+  await ensureAuthenticated()
+
+  // Look up the existing payout so we can keep a linked income transaction in
+  // sync when an already-received milestone is edited.
+  const { data: existing } = await supabase
+    .from("project_payouts")
+    .select("status, transaction_id, projects ( name )")
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+    .single()
+
+  const { error } = await supabase
+    .from("project_payouts")
+    .update({
+      label: input.label,
+      percent: input.percent,
+      amount: input.amount,
+      due_date: input.dueDate,
+      notes: input.notes,
+    })
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error updating project payout:", error.message)
+    return false
+  }
+
+  // If this milestone was already received, mirror the edit onto its ledger
+  // entry so the wallet balance and transaction history stay consistent.
+  if (existing?.status === "received" && existing.transaction_id) {
+    const project = firstRelation(existing.projects as { name: string } | { name: string }[] | null)
+    const { error: txError } = await supabase
+      .from("transactions")
+      .update({
+        amount: input.amount,
+        description: `${project?.name ?? "Project"} — ${input.label}`,
+      })
+      .eq("id", existing.transaction_id)
+      .eq("user_id", DEMO_USER_ID)
+    if (txError) {
+      console.error("Error syncing payout transaction:", txError.message)
+    }
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function deleteProjectPayout(payoutId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  // Remove any linked income transaction first so balances stay correct.
+  const { data: existing } = await supabase
+    .from("project_payouts")
+    .select("transaction_id")
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+    .single()
+
+  if (existing?.transaction_id) {
+    await deleteTransactions([existing.transaction_id])
+  }
+
+  const { error } = await supabase
+    .from("project_payouts")
+    .delete()
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error deleting project payout:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+async function getProjectIncomeCategoryId(): Promise<string | undefined> {
+  const { data } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("name", "Project Income")
+    .limit(1)
+    .maybeSingle()
+  return data?.id
+}
+
+/**
+ * Marks a payout milestone as received: creates an income transaction that
+ * inflows into the chosen wallet, then links it to the payout.
+ */
+export async function receiveProjectPayout({
+  payoutId,
+  projectName,
+  label,
+  amount,
+  accountId,
+  receivedAt,
+}: {
+  payoutId: string
+  projectName: string
+  label: string
+  amount: number
+  accountId: string
+  receivedAt: string
+}): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const categoryId = await getProjectIncomeCategoryId()
+  const txId = await addTransaction({
+    amount,
+    type: "income",
+    direction: "in",
+    description: `${projectName} — ${label}`,
+    account_id: accountId,
+    category_id: categoryId,
+    occurred_at: new Date(`${receivedAt}T12:00:00`).toISOString(),
+    metadata: { source: "project_payout" },
+  })
+
+  if (!txId || typeof txId !== "string") {
+    return false
+  }
+
+  const { error } = await supabase
+    .from("project_payouts")
+    .update({
+      status: "received",
+      account_id: accountId,
+      received_at: receivedAt,
+      transaction_id: txId,
+    })
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error receiving project payout:", error.message)
+    // Roll back the orphaned transaction.
+    await deleteTransactions([txId])
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+/** Reverses a received payout: deletes the linked transaction and resets status. */
+export async function unreceiveProjectPayout(payoutId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { data: existing } = await supabase
+    .from("project_payouts")
+    .select("transaction_id")
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+    .single()
+
+  if (existing?.transaction_id) {
+    await deleteTransactions([existing.transaction_id])
+  }
+
+  const { error } = await supabase
+    .from("project_payouts")
+    .update({
+      status: "pending",
+      account_id: null,
+      received_at: null,
+      transaction_id: null,
+    })
+    .eq("id", payoutId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error reversing project payout:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function addProjectMember(
+  projectId: string,
+  input: ProjectMemberInput
+): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase.from("project_members").insert({
+    project_id: projectId,
+    user_id: DEMO_USER_ID,
+    contact_id: input.contactId,
+    name: input.name,
+    role: input.role,
+    dividend_amount: input.dividendAmount,
+    dividend_percent: input.dividendPercent,
+  })
+
+  if (error) {
+    console.error("Error adding project member:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function updateProjectMember(
+  memberId: string,
+  input: ProjectMemberInput
+): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase
+    .from("project_members")
+    .update({
+      contact_id: input.contactId,
+      name: input.name,
+      role: input.role,
+      dividend_amount: input.dividendAmount,
+      dividend_percent: input.dividendPercent,
+    })
+    .eq("id", memberId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error updating project member:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
+}
+
+export async function deleteProjectMember(memberId: string): Promise<boolean> {
+  await ensureAuthenticated()
+
+  const { error } = await supabase
+    .from("project_members")
+    .delete()
+    .eq("id", memberId)
+    .eq("user_id", DEMO_USER_ID)
+
+  if (error) {
+    console.error("Error deleting project member:", error.message)
+    return false
+  }
+
+  invalidateProjectCaches()
+  return true
 }

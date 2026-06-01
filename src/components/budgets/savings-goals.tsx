@@ -878,7 +878,7 @@ function ContributionHistoryDialog({
                   
                   // Auto-fill allocation for convenience
                   if (!editingContribution && accounts.length > 0) {
-                    const parsed = parseCurrencyAmount(val)
+                    const parsed = parseCurrencyAmount(val) ?? 0
                     if (parsed > 0) {
                       setAllocations([{ accountId: accounts[0].id, amount: parsed }])
                     } else {
@@ -908,10 +908,10 @@ function ContributionHistoryDialog({
                 placeholder="May savings"
               />
             </div>
-            {!editingContribution && parseCurrencyAmount(form.amount) > 0 && (
+            {!editingContribution && (parseCurrencyAmount(form.amount) ?? 0) > 0 && (
               <MultiWalletSelector
                 accounts={accounts}
-                targetAmount={parseCurrencyAmount(form.amount)}
+                targetAmount={parseCurrencyAmount(form.amount) ?? 0}
                 allocations={allocations}
                 onAllocationsChange={setAllocations}
                 mode="fund"
@@ -921,7 +921,7 @@ function ContributionHistoryDialog({
             <div className="flex flex-wrap gap-2 pt-2">
               <Button onClick={handleSaveContribution} disabled={
                 isSaving || 
-                (!editingContribution && parseCurrencyAmount(form.amount) > 0 && Math.abs(allocations.reduce((sum, a) => sum + (a.amount || 0), 0) - parseCurrencyAmount(form.amount)) > 0.01) ||
+                (!editingContribution && (parseCurrencyAmount(form.amount) ?? 0) > 0 && Math.abs(allocations.reduce((sum, a) => sum + (a.amount || 0), 0) - (parseCurrencyAmount(form.amount) ?? 0)) > 0.01) ||
                 (!editingContribution && allocations.some(a => {
                   const acc = accounts.find(ac => ac.id === a.accountId)
                   return acc && a.amount > acc.balance
