@@ -48,6 +48,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
@@ -60,9 +67,13 @@ import {
   getSavingsGoals,
   updateSavingsGoal,
   updateSavingsGoalContribution,
+  getAccounts,
+  addTransaction,
+  type AccountWithBalance,
   type DbSavingsGoal,
   type DbSavingsGoalContribution,
 } from "@/lib/supabase"
+import { MultiWalletSelector, type WalletAllocation } from "@/components/shared/multi-wallet-selector"
 import {
   buildSavingsGoalSummary,
   normalizeDateInput,
@@ -700,6 +711,8 @@ function ContributionHistoryDialog({
   onChanged: () => Promise<void>
 }) {
   const [contributions, setContributions] = useState<DbSavingsGoalContribution[]>([])
+  const [accounts, setAccounts] = useState<AccountWithBalance[]>([])
+  const [allocations, setAllocations] = useState<WalletAllocation[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [editingContribution, setEditingContribution] = useState<DbSavingsGoalContribution | null>(null)
@@ -712,8 +725,19 @@ function ContributionHistoryDialog({
 
   async function loadContributions(goalId: string) {
     setIsLoading(true)
-    const data = await getSavingsGoalContributions(goalId)
+    const [data, accountsData] = await Promise.all([
+      getSavingsGoalContributions(goalId),
+      getAccounts(),
+    ])
     setContributions(data)
+    setAccounts(accountsData)
+    if (accountsData.length > 0) {
+      // Pre-fill the allocation amount with the goal's monthly contribution if applicable
+      const initialAmt = goal?.monthly_contribution || 0
+      setAllocations([{ accountId: accountsData[0].id, amount: initialAmt }])
+    } else {
+      setAllocations([])
+    }
     setIsLoading(false)
   }
 
@@ -740,26 +764,63 @@ function ContributionHistoryDialog({
       setFormError("Amount and date are required.")
       return
     }
+    const allocatedTotal = allocations.reduce((sum, a) => sum + (a.amount || 0), 0)
+
+    if (!editingContribution && amount > 0) {
+      if (Math.abs(allocatedTotal - amount) > 0.01) {
+        setFormError(`Please allocate exactly ৳${amount.toLocaleString()} across your wallets.`)
+        return
+      }
+    }
 
     setIsSaving(true)
-    const saved = editingContribution
-      ? await updateSavingsGoalContribution({
-          contributionId: editingContribution.id,
-          amount,
-          contributedAt: form.contributedAt,
-          notes: form.notes,
-        })
-      : await addSavingsGoalContribution({
-          goalId: selectedGoal.id,
-          amount,
-          contributedAt: form.contributedAt,
-          notes: form.notes,
-        })
-    setIsSaving(false)
 
-    if (!saved) {
-      setFormError("Could not save this contribution.")
-      return
+    // Deduct from wallet only when creating a new contribution
+    if (!editingContribution && amount > 0) {
+      let anyFailed = false
+      for (const allocation of allocations) {
+        if (allocation.amount > 0) {
+          const txId = await addTransaction({
+            amount: allocation.amount,
+            type: "goal_contribution",
+            direction: "out",
+            description: `Goal Contribution: ${selectedGoal.name}`,
+            account_id: allocation.accountId,
+            metadata: { icon: selectedGoal.icon },
+          })
+          
+          if (txId && typeof txId === "string") {
+            const saved = await addSavingsGoalContribution({
+              goalId: selectedGoal.id,
+              amount: allocation.amount,
+              contributedAt: form.contributedAt,
+              notes: form.notes,
+              transactionId: txId,
+            })
+            if (!saved) anyFailed = true
+          } else {
+            anyFailed = true
+          }
+        }
+      }
+      setIsSaving(false)
+      if (anyFailed) {
+        setFormError("Could not save all contributions.")
+        return
+      }
+    } else {
+      // Editing existing contribution
+      const saved = await updateSavingsGoalContribution({
+        contributionId: editingContribution!.id,
+        amount,
+        contributedAt: form.contributedAt,
+        notes: form.notes,
+      })
+      setIsSaving(false)
+      if (!saved) {
+        setFormError("Could not save this contribution.")
+        return
+      }
     }
 
     setEditingContribution(null)
@@ -794,13 +855,13 @@ function ContributionHistoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{selectedGoal.name} History</DialogTitle>
           <DialogDescription className="sr-only">{selectedGoal.name} contribution history</DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="flex flex-col gap-3 rounded-lg border p-3">
             <p className="text-sm font-semibold">
               {editingContribution ? "Edit Contribution" : "Add Contribution"}
@@ -811,7 +872,20 @@ function ContributionHistoryDialog({
                 id="contribution-amount"
                 inputMode="decimal"
                 value={form.amount}
-                onChange={(event) => setForm({ ...form, amount: event.target.value })}
+                onChange={(event) => {
+                  const val = event.target.value
+                  setForm({ ...form, amount: val })
+                  
+                  // Auto-fill allocation for convenience
+                  if (!editingContribution && accounts.length > 0) {
+                    const parsed = parseCurrencyAmount(val)
+                    if (parsed > 0) {
+                      setAllocations([{ accountId: accounts[0].id, amount: parsed }])
+                    } else {
+                      setAllocations([{ accountId: accounts[0].id, amount: 0 }])
+                    }
+                  }
+                }}
                 placeholder="10000"
               />
             </div>
@@ -834,9 +908,25 @@ function ContributionHistoryDialog({
                 placeholder="May savings"
               />
             </div>
+            {!editingContribution && parseCurrencyAmount(form.amount) > 0 && (
+              <MultiWalletSelector
+                accounts={accounts}
+                targetAmount={parseCurrencyAmount(form.amount)}
+                allocations={allocations}
+                onAllocationsChange={setAllocations}
+                mode="fund"
+              />
+            )}
             {formError && <p className="text-sm text-destructive">{formError}</p>}
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={handleSaveContribution} disabled={isSaving}>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button onClick={handleSaveContribution} disabled={
+                isSaving || 
+                (!editingContribution && parseCurrencyAmount(form.amount) > 0 && Math.abs(allocations.reduce((sum, a) => sum + (a.amount || 0), 0) - parseCurrencyAmount(form.amount)) > 0.01) ||
+                (!editingContribution && allocations.some(a => {
+                  const acc = accounts.find(ac => ac.id === a.accountId)
+                  return acc && a.amount > acc.balance
+                }))
+              }>
                 {isSaving && <Loader2Icon data-icon="inline-start" className="animate-spin" />}
                 {editingContribution ? "Update" : "Add Contribution"}
               </Button>

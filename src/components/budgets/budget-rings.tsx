@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { MultiWalletSelector, type WalletAllocation } from "@/components/shared/multi-wallet-selector"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   ArrowDownIcon,
@@ -86,6 +87,9 @@ import {
   getProfileBudgets,
   getTransactions,
   updateCategoryBudgetSettings,
+  getAccounts,
+  addTransaction,
+  type AccountWithBalance,
 } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 
@@ -268,9 +272,10 @@ function validateBudgetItems(items: BudgetCategoryItem[]) {
 }
 
 async function loadBudgetData() {
-  const [budgetSettings, txData] = await Promise.all([
+  const [budgetSettings, txData, accounts] = await Promise.all([
     getProfileBudgets(),
     getTransactions(),
+    getAccounts(),
   ])
 
   const now = new Date()
@@ -284,6 +289,8 @@ async function loadBudgetData() {
       tx.direction === "out" &&
       tx.type !== "transfer" &&
       tx.type !== "goal_contribution" &&
+      tx.type !== "adjustment" &&
+      tx.metadata?.is_budget_allocation !== true &&
       txDate.getFullYear() === currentYear &&
       txDate.getMonth() === currentMonth
     ) {
@@ -306,6 +313,7 @@ async function loadBudgetData() {
     budgetItems: normalizeBudgetCategorySettings(rawSettings),
     spentByCategory: nextSpentByCategory,
     budgetSetForMonth,
+    accounts,
   }
 }
 
@@ -319,6 +327,8 @@ export function BudgetRings() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedCategoryId, setSelectedCategoryId] = useState("")
   const [newBudgetVal, setNewBudgetVal] = useState("")
+  const [allocations, setAllocations] = useState<WalletAllocation[]>([])
+  const [accounts, setAccounts] = useState<AccountWithBalance[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
@@ -338,6 +348,7 @@ export function BudgetRings() {
         buildCategoryData(nextData.budgetItems, nextData.spentByCategory)
       )
       setBudgetSetForMonth(nextData.budgetSetForMonth)
+      setAccounts(nextData.accounts)
       setIsLoading(false)
     }
 
@@ -371,6 +382,11 @@ export function BudgetRings() {
     setSelectedCategoryId(categoryId)
     const catData = categories.find((category) => category.id === categoryId)
     setNewBudgetVal(catData ? String(catData.budget) : "5000")
+    if (accounts.length > 0) {
+      setAllocations([{ accountId: accounts[0].id, amount: 0 }])
+    } else {
+      setAllocations([])
+    }
     setSaveSuccess(false)
     setIsDialogOpen(true)
   }
@@ -388,8 +404,39 @@ export function BudgetRings() {
   const handleSaveBudget = async () => {
     const amount = parseFloat(newBudgetVal)
     if (Number.isNaN(amount) || amount < 0 || !selectedCategory) return
+    
+    const difference = amount - selectedCategory.budget
+    const absDifference = Math.abs(difference)
+    const allocatedTotal = allocations.reduce((sum, a) => sum + (a.amount || 0), 0)
+
+    if (absDifference > 0.01 && Math.abs(allocatedTotal - absDifference) > 0.01) {
+      // Must allocate exactly the difference
+      return
+    }
 
     setIsSaving(true)
+
+    // Deduct or refund from wallets based on allocations
+    if (absDifference > 0.01) {
+      for (const allocation of allocations) {
+        if (allocation.amount > 0) {
+          await addTransaction({
+            amount: allocation.amount,
+            type: "adjustment",
+            direction: difference > 0 ? "out" : "in",
+            description: difference > 0 
+              ? `Budget Allocation: ${selectedCategory.name}`
+              : `Budget Refund: ${selectedCategory.name}`,
+            account_id: allocation.accountId,
+            metadata: { 
+              icon: selectedCategory.icon,
+              is_budget_allocation: true
+            },
+          })
+        }
+      }
+    }
+
     const updatedItems = toBudgetItems(categories).map((category) =>
       category.id === selectedCategory.id ? { ...category, budget: amount } : category
     )
@@ -434,6 +481,10 @@ export function BudgetRings() {
   const handleDeleteCategory = (categoryId: string) => {
     setDraftCategories((current) => {
       try {
+        const cat = current.find(c => c.id === categoryId)
+        if (cat && cat.budget > 0) {
+          throw new Error(`Please unallocate funds (৳${cat.budget}) before deleting "${cat.name}".`)
+        }
         return deleteBudgetCategoryItem(current, categoryId)
       } catch (error) {
         setManagerError(
@@ -676,18 +727,49 @@ export function BudgetRings() {
                       step="100"
                       className="pl-7 font-mono font-bold tracking-wide"
                       value={newBudgetVal}
-                      onChange={(event) => setNewBudgetVal(event.target.value)}
+                      onChange={(event) => {
+                        const val = event.target.value
+                        setNewBudgetVal(val)
+                        const amount = parseFloat(val)
+                        if (!isNaN(amount) && selectedCategory) {
+                          const diff = Math.abs(amount - selectedCategory.budget)
+                          if (accounts.length > 0) {
+                            setAllocations([{ accountId: accounts[0].id, amount: diff }])
+                          }
+                        } else if (accounts.length > 0) {
+                          setAllocations([{ accountId: accounts[0].id, amount: 0 }])
+                        }
+                      }}
                     />
                   </div>
                 </div>
 
-                <DialogFooter className="flex-col sm:flex-row gap-2">
+                {(() => {
+                  const difference = parseFloat(newBudgetVal || "0") - (selectedCategory?.budget || 0)
+                  const absDiff = Math.abs(difference)
+
+                  return (
+                    <MultiWalletSelector
+                      accounts={accounts}
+                      targetAmount={absDiff}
+                      allocations={allocations}
+                      onAllocationsChange={setAllocations}
+                      mode={difference >= 0 ? "fund" : "refund"}
+                      className="mt-2"
+                    />
+                  )
+                })()}
+
+                <DialogFooter className="flex-col sm:flex-row gap-2 mt-4">
                   <div className="flex w-full gap-2">
                     <Button
                       variant="destructive"
                       className="w-full sm:w-auto"
                       onClick={() => {
                         setNewBudgetVal("0")
+                        if (selectedCategory && accounts.length > 0) {
+                          setAllocations([{ accountId: accounts[0].id, amount: selectedCategory.budget }])
+                        }
                       }}
                       disabled={isSaving}
                     >
@@ -704,7 +786,16 @@ export function BudgetRings() {
                     </Button>
                     <Button
                       onClick={handleSaveBudget}
-                      disabled={isSaving || newBudgetVal === ""}
+                      disabled={
+                        isSaving || 
+                        newBudgetVal === "" || 
+                        (Math.abs(parseFloat(newBudgetVal || "0") - (selectedCategory?.budget || 0)) > 0.01 && 
+                         Math.abs(allocations.reduce((sum, a) => sum + (a.amount || 0), 0) - Math.abs(parseFloat(newBudgetVal || "0") - (selectedCategory?.budget || 0))) > 0.01) ||
+                        (parseFloat(newBudgetVal || "0") - (selectedCategory?.budget || 0) > 0.01 && allocations.some(a => {
+                          const acc = accounts.find(ac => ac.id === a.accountId)
+                          return acc && a.amount > acc.balance
+                        }))
+                      }
                     >
                       {isSaving ? (
                         <>

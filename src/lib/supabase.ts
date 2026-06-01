@@ -559,7 +559,7 @@ export async function addTransaction(data: {
 }) {
   await ensureAuthenticated()
 
-  const { error } = await supabase
+  const { data: inserted, error } = await supabase
     .from("transactions")
     .insert({
       user_id: DEMO_USER_ID,
@@ -572,13 +572,15 @@ export async function addTransaction(data: {
       metadata: data.metadata || {},
       occurred_at: data.occurred_at || new Date().toISOString()
     })
+    .select("id")
+    .single()
 
   if (error) {
     console.error("Error adding transaction:", error.message)
     return false
   }
   invalidateTransactionCaches()
-  return true
+  return inserted.id
 }
 
 export async function deleteTransactions(transactionIds: string[]): Promise<boolean> {
@@ -810,11 +812,13 @@ export async function addSavingsGoalContribution({
   amount,
   contributedAt,
   notes,
+  transactionId,
 }: {
   goalId: string
   amount: number
   contributedAt: string
   notes?: string | null
+  transactionId?: string
 }): Promise<DbSavingsGoalContribution | null> {
   await ensureAuthenticated()
 
@@ -823,6 +827,7 @@ export async function addSavingsGoalContribution({
     p_amount: amount,
     p_contributed_at: contributedAt,
     p_notes: notes || null,
+    p_transaction_id: transactionId || null,
   })
 
   if (error) {
